@@ -110,7 +110,8 @@
                                         </div>
 
                                     </div>
-                                    <div class="col-md-6" id="siswa-by-kelas">
+
+                                    <div class="col-md-6">
                                         <label for="semua_kelas" class="text-dark">Pembayaran Untuk</label>
 
                                         <br>
