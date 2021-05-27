@@ -15,7 +15,7 @@ class CreateTagihanDetailsTable extends Migration
     {
         Schema::create('tagihan_details', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('tagihan_id');
+            $table->foreignId('tagihan_id')->constrained('tagihan');
             $table->string('status');
             $table->integer('total_bayar');
             $table->integer('sisa');

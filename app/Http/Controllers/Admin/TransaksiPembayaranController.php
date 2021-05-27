@@ -25,17 +25,16 @@ class TransaksiPembayaranController extends Controller
 
         if (!empty($request->keyword)) {
             $this->keyword = $request->keyword;
-            
-            $pembayaran = $pembayaran->where('kode_pembayaran','like',"%".$this->keyword."%")
-            ->orWhere('metode_pembayaran', 'like', "%".$this->keyword."%")
-            ->orWhere('status', 'like', "%".$this->keyword."%")
-            ->orWhere('created_at', 'like', "%".$this->keyword."%");
+
+            $pembayaran = $pembayaran->where('kode_pembayaran', 'like', "%" . $this->keyword . "%")
+                ->orWhere('metode_pembayaran', 'like', "%" . $this->keyword . "%")
+                ->orWhere('status', 'like', "%" . $this->keyword . "%")
+                ->orWhere('created_at', 'like', "%" . $this->keyword . "%");
 
             $pembayaran = $pembayaran->orWhereHas('siswa', function ($query) {
-                $query->where('nama_lengkap', 'like', "%".$this->keyword."%")
-                ->orWhere('nis', 'like', "%".$this->keyword."%");
+                $query->where('nama_lengkap', 'like', "%" . $this->keyword . "%")
+                    ->orWhere('nis', 'like', "%" . $this->keyword . "%");
             });
-            
         }
 
         return view('admin.pembayaran.index')->with('pembayaran', $pembayaran->where('status', '!=', 'Draft')->paginate(20));
@@ -64,7 +63,7 @@ class TransaksiPembayaranController extends Controller
                 'Juni',
             ];
             $this->keyword = $request->siswa_id;
-            
+
             $tagihanSiswa = Siswa::with('tagihan')->findOrFail($this->keyword);
             // dd($tagihanSiswa);
             // $pembayaran = $pembayaran->orWhereHas('kategori', function ($query) {
@@ -73,7 +72,6 @@ class TransaksiPembayaranController extends Controller
 
             $siswa = Siswa::all();
             return view('admin.pembayaran.create', compact('siswa', 'tagihanSiswa', 'bulan'));
-            
         }
         $siswa = Siswa::all();
         return view('admin.pembayaran.create', compact('siswa'));
@@ -114,7 +112,7 @@ class TransaksiPembayaranController extends Controller
      */
     public function show($id)
     {
-        $detail = TransaksiPembayaran::with('siswa', 'detail_pembayaran','user')->findOrFail($id);
+        $detail = TransaksiPembayaran::with('siswa', 'detail_pembayaran', 'user')->findOrFail($id);
         // return $detail;
         return view('admin.pembayaran.detail', compact('detail'));
     }
@@ -153,23 +151,26 @@ class TransaksiPembayaranController extends Controller
         //
     }
 
-    public function getSiswa(Request $request){
-        $siswa = Siswa::with('kelas', 'tagihan')->where('nama_lengkap','like',"%".$request->keyword."%")
-                        ->orWhere('nis', 'like', "%$request->keyword%");
+    public function getSiswa(Request $request)
+    {
+        $siswa = Siswa::with('kelas', 'tagihan')->where('nama_lengkap', 'like', "%" . $request->keyword . "%")
+            ->orWhere('nis', 'like', "%$request->keyword%");
 
         return response()->json($siswa->get(), 200);
     }
 
-    public function getTagihan($id){
+    public function getTagihan($id)
+    {
         $tagihan = Tagihan::with('siswa', 'tagihan_detail', 'jenis_pembayaran')->where('siswa_id', $id);
         return response()->json($tagihan->get(), 200);
     }
 
-    public function cetak($id){
-        
+    public function cetak($id)
+    {
+
         $detail = TransaksiPembayaran::with('siswa', 'detail_pembayaran')->findOrFail($id);
         $sekolahInfo = PengaturanSekolah::all()->first();
-        
+
         return view('admin.pembayaran.cetak', compact('detail', 'sekolahInfo'));
     }
 }

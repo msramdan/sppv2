@@ -15,8 +15,8 @@ class CreateTagihanTable extends Migration
     {
         Schema::create('tagihan', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('siswa_id');
-            $table->unsignedBigInteger('jenis_pembayaran_id');
+            $table->foreignId('siswa_id')->constrained('siswa');
+            $table->foreignId('jenis_pembayaran_id')->constrained('jenis_pembayaran');
             $table->timestamps();
         });
     }

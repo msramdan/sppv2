@@ -27,8 +27,8 @@ class CreateSiswaTable extends Migration
             $table->string('no_telp_orangtua');
             $table->string('status');
             $table->string('foto');
-            $table->unsignedBigInteger('kelas_id')->nullable();
-            $table->unsignedBigInteger('user_id');
+            $table->foreignId('kelas_id')->constrained('kelas')->default('1');
+            $table->foreignId('user_id')->constrained('users');
             $table->timestamps();
         });
     }
@@ -40,6 +40,6 @@ class CreateSiswaTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('siswa');
+        //
     }
 }

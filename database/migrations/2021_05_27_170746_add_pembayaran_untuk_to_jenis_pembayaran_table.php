@@ -26,7 +26,7 @@ class AddPembayaranUntukToJenisPembayaranTable extends Migration
     public function down()
     {
         Schema::table('jenis_pembayaran', function (Blueprint $table) {
-            $table->string('pembayaran_untuk');
+            //
         });
     }
 }

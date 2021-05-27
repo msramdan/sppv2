@@ -177,6 +177,7 @@ class JenisPembayaranController extends Controller
     public function edit($id)
     {
         $jenis_pembayaran = JenisPembayaran::with('tagihan')->findOrFail($id);
+        // string to array
         $pembayaran_untuk = explode(',', $jenis_pembayaran->pembayaran_untuk);
 
         $tahun_ajaran = Tahunajaran::all();

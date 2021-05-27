@@ -9,11 +9,16 @@ use Faker\Generator as Faker;
 
 $factory->define(Siswa::class, function (Faker $faker) {
     $gender = $faker->randomElement(['male', 'female']);
+
     $year = $faker->dateTimeBetween($startDate = '-18 years', $endDate = '-15 years');
+
     $kode = substr($year->format('Y'), 1, 3);
+
+    $kelas = Kelas::all()->count();
+
     return [
-        'nis' => $kode.rand(111, 999).rand(1111,9999),
-        'nama_lengkap' => $faker->firstName($gender)." ".$faker->lastName($gender),
+        'nis' => $kode . rand(111, 999) . rand(1111, 9999),
+        'nama_lengkap' => $faker->firstName($gender) . " " . $faker->lastName($gender),
         'jenis_kelamin' => $gender,
         'tanggal_lahir' => $year,
         'tempat_lahir' => $faker->city,
@@ -25,5 +30,6 @@ $factory->define(Siswa::class, function (Faker $faker) {
         'status' => 'Aktif',
         'foto' => 'siswa_default.png',
         'user_id' => '3',
+        'kelas_id' => rand(1, $kelas)
     ];
 });

@@ -15,8 +15,8 @@ class CreateDetailPembayaranTable extends Migration
     {
         Schema::create('detail_pembayaran', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('transaksi_pembayaran_id');
-            $table->unsignedBigInteger('tagihan_details_id');
+            $table->foreignId('transaksi_pembayaran_id')->constrained('transaksi_pembayaran');
+            $table->foreignId('tagihan_details_id')->constrained('tagihan_details');
             $table->string('nama_pembayaran');
             $table->string('keterangan');
             $table->integer('harga');
