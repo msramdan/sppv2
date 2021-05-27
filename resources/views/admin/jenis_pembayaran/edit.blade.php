@@ -127,13 +127,13 @@
                                                 </div>
 
                                                 <div class="form-group">
-                                                    @foreach ($kelas as $kls)
+                                                    @foreach ($kelas as $index => $kls)
                                                         <div class="custom-control custom-checkbox">
                                                             <input type="checkbox" name="semua_siswa_kelas[]"
                                                                 value="{{ $kls->id }}" class="custom-control-input"
-                                                                id="customCheck{{ $kls->id + 99 }}"
-                                                                {{ $jenis_pembayaran->pembayaran_untuk == 'semua kelas' ? 'checked' : '' }}
-                                                                {{ $jenis_pembayaran->pembayaran_untuk == $kls->id ? 'checked' : '' }}>
+                                                                id="customCheck{{ $kls->id + 99 }}" @if ($jenis_pembayaran->pembayaran_untuk == 'semua kelas') checked
+                                                                @elseif ($pembayaran_untuk[$index] == $kls->id)
+                                                                    checked @endif>
 
                                                             <label class="custom-control-label"
                                                                 for="customCheck{{ $kls->id + 99 }}">Semua
