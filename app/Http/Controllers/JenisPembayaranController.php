@@ -177,6 +177,7 @@ class JenisPembayaranController extends Controller
     public function edit($id)
     {
         $jenis_pembayaran = JenisPembayaran::with('tagihan')->findOrFail($id);
+        $pembayaran_untuk = explode(',', $jenis_pembayaran->pembayaran_untuk);
 
         $tahun_ajaran = Tahunajaran::all();
 
@@ -199,7 +200,7 @@ class JenisPembayaranController extends Controller
         // echo json_encode($kelas);
         // die;
 
-        return view('admin.jenis_pembayaran.edit', compact('jenis_pembayaran', 'tahun_ajaran', 'unselected_kelas', 'kelas'));
+        return view('admin.jenis_pembayaran.edit', compact('jenis_pembayaran', 'tahun_ajaran', 'unselected_kelas', 'kelas', 'pembayaran_untuk'));
     }
 
     /**
