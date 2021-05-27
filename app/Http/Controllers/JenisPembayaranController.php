@@ -67,7 +67,7 @@ class JenisPembayaranController extends Controller
 
             $siswa = Siswa::whereIn('kelas_id', $semua_kelas)->where('status', 'Aktif')->get()->pluck('id');
 
-            $this->insertTagihan($siswa, $request);
+            $this->insertTagihan($siswa, $request, ['semua kelas']);
 
             session()->flash('success', 'Data Berhasil Disimpan');
 
@@ -80,7 +80,7 @@ class JenisPembayaranController extends Controller
 
             $siswa = Siswa::whereIn('kelas_id', $kelas)->where('status', 'Aktif')->get()->pluck('id');
 
-            $this->insertTagihan($siswa, $request);
+            $this->insertTagihan($siswa, $request, $request->semua_siswa_kelas);
 
             session()->flash('success', 'Data Berhasil Disimpan');
 
@@ -92,7 +92,7 @@ class JenisPembayaranController extends Controller
 
             $siswa = Siswa::whereIn('id', $request->per_siswa)->where('status', 'Aktif')->get()->pluck('id');
 
-            $this->insertTagihan($siswa, $request);
+            $this->insertTagihan($siswa, $request, ['per siswa']);
 
             session()->flash('success', 'Data Berhasil Disimpan');
 
@@ -101,7 +101,7 @@ class JenisPembayaranController extends Controller
     }
 
 
-    public function insertTagihan($siswa, $request)
+    public function insertTagihan($siswa, $request, $pembayaran_untuk)
     {
         $bulan = \BulanHelper::getBulan();
 
@@ -109,7 +109,9 @@ class JenisPembayaranController extends Controller
             'nama_pembayaran' => $request->nama_pembayaran,
             'tahunajaran_id' => $request->tahunajaran_id,
             'tipe' => $request->tipe,
-            'harga' => $request->harga
+            'harga' => $request->harga,
+            // array to string
+            'pembayaran_untuk' => implode(", ", $pembayaran_untuk),
         ]);
 
         /**
@@ -175,10 +177,29 @@ class JenisPembayaranController extends Controller
     public function edit($id)
     {
         $jenis_pembayaran = JenisPembayaran::with('tagihan')->findOrFail($id);
-        $tahun_ajaran = Tahunajaran::all();
-        $kelas = Kelas::with('siswa')->get();
 
-        return view('admin.jenis_pembayaran.edit', compact('jenis_pembayaran', 'tahun_ajaran', 'kelas'));
+        $tahun_ajaran = Tahunajaran::all();
+
+        $siswa_id = [];
+        foreach ($jenis_pembayaran->tagihan as $tagihan) {
+            $siswa_id[] = $tagihan->siswa_id;
+        }
+
+        // dd($siswa_id);
+        // $unselected_siswa = Siswa::with('kelas')->whereNotIn('id', $siswa_id)->get();
+
+        $unselected_kelas = Kelas::with('siswa')->whereHas('siswa', function ($query) use ($siswa_id) {
+            $query->whereNotIn('id', $siswa_id);
+        })->get();
+
+        $kelas = Kelas::with('siswa')->whereHas('siswa', function ($query) use ($siswa_id) {
+            $query->whereIn('id', $siswa_id);
+        })->get();
+
+        // echo json_encode($kelas);
+        // die;
+
+        return view('admin.jenis_pembayaran.edit', compact('jenis_pembayaran', 'tahun_ajaran', 'unselected_kelas', 'kelas'));
     }
 
     /**

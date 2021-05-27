@@ -47,6 +47,7 @@
                                     </div>
                                 </div>
                             </form>
+
                             <div class="table-responsive">
                                 <table class="table table-head-fixed text-nowrap table-bordered">
                                     <thead>

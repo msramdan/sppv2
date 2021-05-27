@@ -115,10 +115,13 @@
                                             data-target="#panel-body-kelas">
                                             <h4>Kelas</h4>
                                         </div>
+
                                         <div class="accordion-body collapse" id="panel-body-kelas" data-parent="#accordion">
+
                                             <div class="form-group mb-0">
                                                 <div class="custom-control custom-checkbox">
                                                     <input type="checkbox" name="semua_kelas" value="semua"
+                                                        {{ $jenis_pembayaran->pembayaran_untuk == 'semua kelas' ? 'checked' : '' }}
                                                         class="custom-control-input" id="one">
                                                     <label class="custom-control-label" for="one">Semua Kelas</label>
                                                 </div>
@@ -128,7 +131,23 @@
                                                         <div class="custom-control custom-checkbox">
                                                             <input type="checkbox" name="semua_siswa_kelas[]"
                                                                 value="{{ $kls->id }}" class="custom-control-input"
-                                                                id="customCheck{{ $kls->id + 99 }}">
+                                                                id="customCheck{{ $kls->id + 99 }}"
+                                                                {{ $jenis_pembayaran->pembayaran_untuk == 'semua kelas' ? 'checked' : '' }}
+                                                                {{ $jenis_pembayaran->pembayaran_untuk == $kls->id ? 'checked' : '' }}>
+
+                                                            <label class="custom-control-label"
+                                                                for="customCheck{{ $kls->id + 99 }}">Semua
+                                                                Siswa
+                                                                {{ $kls->nama_kelas }}</label>
+                                                        </div>
+                                                    @endforeach
+
+                                                    @foreach ($unselected_kelas as $kls)
+                                                        <div class="custom-control custom-checkbox">
+                                                            <input type="checkbox" name="semua_siswa_kelas[]"
+                                                                value="{{ $kls->id }}" class="custom-control-input"
+                                                                id="customCheck{{ $kls->id + 99 }}"
+                                                                {{ $jenis_pembayaran->pembayaran_untuk == 'semua kelas' ? 'checked' : '' }}>
 
                                                             <label class="custom-control-label"
                                                                 for="customCheck{{ $kls->id + 99 }}">Semua
@@ -144,12 +163,14 @@
                                     {{-- per siswa --}}
                                     <div id="accordion">
                                         <label class="text-dark">Per siswa</label>
+
                                         @foreach ($kelas as $kls)
                                             <div class="accordion">
                                                 <div class="accordion-header" role="button" data-toggle="collapse"
                                                     data-target="#panel-body-{{ $kls->id }}">
                                                     <h4>{{ $kls->nama_kelas }}</h4>
                                                 </div>
+
                                                 <div class="accordion-body collapse" id="panel-body-{{ $kls->id }}"
                                                     data-parent="#accordion">
 
@@ -158,9 +179,33 @@
                                                             <input type="checkbox" name="per_siswa[]"
                                                                 value="{{ $sws->id }}"
                                                                 class="custom-control-input kelas-choice"
-                                                                id="customCheck{{ $sws->id }}" @if (is_array(old('per_siswa')) && in_array($sws->id, old('per_siswa'))) checked @endif>
+                                                                id="customCheck{{ $sws->id }}" checked>
                                                             <label class="custom-control-label"
                                                                 for="customCheck{{ $sws->id }}">{{ $sws->nis . ' - ' . $sws->nama_lengkap }}</label>
+                                                        </div>
+                                                    @endforeach
+                                                </div>
+                                            </div>
+                                        @endforeach
+
+                                        @foreach ($unselected_kelas as $uk)
+                                            <div class="accordion">
+                                                <div class="accordion-header" role="button" data-toggle="collapse"
+                                                    data-target="#panel-body-{{ $uk->id }}">
+                                                    <h4>{{ $uk->nama_kelas }}</h4>
+                                                </div>
+
+                                                <div class="accordion-body collapse" id="panel-body-{{ $uk->id }}"
+                                                    data-parent="#accordion">
+
+                                                    @foreach ($uk->siswa as $uk_sws)
+                                                        <div class="custom-control custom-checkbox">
+                                                            <input type="checkbox" name="per_siswa[]"
+                                                                value="{{ $uk_sws->id }}"
+                                                                class="custom-control-input kelas-choice"
+                                                                id="customCheck{{ $uk_sws->id }}">
+                                                            <label class="custom-control-label"
+                                                                for="customCheck{{ $uk_sws->id }}">{{ $uk_sws->nis . ' - ' . $uk_sws->nama_lengkap }}</label>
                                                         </div>
                                                     @endforeach
                                                 </div>
