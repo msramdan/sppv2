@@ -158,14 +158,14 @@
                                                         data-target="#panel-body-{{ $kls->id }}">
                                                         <h4>{{ $kls->nama_kelas }}</h4>
                                                     </div>
-                                                    <div class="accordion-body collapse"
+                                                    <div class="accordion-body accordion-body-custom collapse"
                                                         id="panel-body-{{ $kls->id }}" data-parent="#accordion">
 
                                                         @foreach ($kls->siswa as $sws)
                                                             <div class="custom-control custom-checkbox">
                                                                 <input type="checkbox" name="per_siswa[]"
                                                                     value="{{ $sws->id }}"
-                                                                    class="custom-control-input kelas-choice"
+                                                                    class="custom-control-input per-murid-choice"
                                                                     id="customCheck{{ $sws->id }}" @if (is_array(old('per_siswa')) && in_array($sws->id, old('per_siswa'))) checked @endif>
                                                                 <label class="custom-control-label"
                                                                     for="customCheck{{ $sws->id }}">{{ $sws->nis . ' - ' . $sws->nama_lengkap }}</label>
@@ -179,7 +179,7 @@
                                 </div>
                             </form>
                         </div>
-                    </div>
+                    </div>s
                     <!-- /.card -->
                 </div>
             </div>
@@ -199,6 +199,18 @@
 
             $("#one").click(function() {
                 $('input:checkbox').not(this).prop('checked', this.checked);
+            });
+
+            $(".per-murid-choice").change(function() {
+                if (this.checked) {
+                    $('.kelas-choice').prop('checked', false);   
+                }
+            });
+
+            $(".kelas-choice").change(function() {
+                if (this.checked) {
+                    $('.per-murid-choice').prop('checked', false);   
+                }
             });
         });
 

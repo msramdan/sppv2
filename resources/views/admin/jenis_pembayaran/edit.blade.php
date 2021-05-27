@@ -130,7 +130,7 @@
                                                     @foreach ($kelas as $kls)
                                                         <div class="custom-control custom-checkbox">
                                                             <input type="checkbox" name="semua_siswa_kelas[]"
-                                                                value="{{ $kls->id }}" class="custom-control-input"
+                                                                value="{{ $kls->id }}" class="custom-control-input kelas-choice"
                                                                 id="customCheck{{ $kls->id + 99 }}"
                                                                 {{ $jenis_pembayaran->pembayaran_untuk == 'semua kelas' ? 'checked' : '' }}
                                                                 {{ $jenis_pembayaran->pembayaran_untuk == $kls->id ? 'checked' : '' }}>
@@ -171,14 +171,14 @@
                                                     <h4>{{ $kls->nama_kelas }}</h4>
                                                 </div>
 
-                                                <div class="accordion-body collapse" id="panel-body-{{ $kls->id }}"
+                                                <div class="accordion-body accordion-body-custom collapse" id="panel-body-{{ $kls->id }}"
                                                     data-parent="#accordion">
 
                                                     @foreach ($kls->siswa as $sws)
                                                         <div class="custom-control custom-checkbox">
                                                             <input type="checkbox" name="per_siswa[]"
                                                                 value="{{ $sws->id }}"
-                                                                class="custom-control-input kelas-choice"
+                                                                class="custom-control-input per-murid-choice"
                                                                 id="customCheck{{ $sws->id }}" checked>
                                                             <label class="custom-control-label"
                                                                 for="customCheck{{ $sws->id }}">{{ $sws->nis . ' - ' . $sws->nama_lengkap }}</label>
@@ -195,7 +195,7 @@
                                                     <h4>{{ $uk->nama_kelas }}</h4>
                                                 </div>
 
-                                                <div class="accordion-body collapse" id="panel-body-{{ $uk->id }}"
+                                                <div class="accordion-body accordion-body-custom collapse" id="panel-body-{{ $uk->id }}"
                                                     data-parent="#accordion">
 
                                                     @foreach ($uk->siswa as $uk_sws)
@@ -232,6 +232,18 @@
             $('#tahunajaran_id').select2()
             $("#one").click(function() {
                 $('input:checkbox').not(this).prop('checked', this.checked);
+            });
+
+            $(".per-murid-choice").change(function() {
+                if (this.checked) {
+                    $('.kelas-choice').prop('checked', false);   
+                }
+            });
+
+            $(".kelas-choice").change(function() {
+                if (this.checked) {
+                    $('.per-murid-choice').prop('checked', false);   
+                }
             });
         });
 
