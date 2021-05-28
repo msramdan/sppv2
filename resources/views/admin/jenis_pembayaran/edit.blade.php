@@ -120,106 +120,98 @@
                                                 <div class="form-group mb-0">
                                                     <div class="custom-control custom-checkbox">
                                                         <input type="checkbox" name="semua_kelas" value="semua"
-                                                            {{ $jenis_pembayaran->pembayaran_untuk == 'semua kelas' ? 'checked' : '' }}
+                                                            {{ $pembayaran_untuk[0] == 'semua kelas' ? 'checked' : '' }}
                                                             class="custom-control-input" id="one">
                                                         <label class="custom-control-label" for="one">Semua Kelas</label>
                                                     </div>
 
                                                     <div class="form-group">
-                                                        @foreach ($kelas as $kls)
+                                                        @php
+                                                            $checked_semua_siswa_kelas = [];
+                                                        @endphp
+
+                                                        @foreach ($kelas as $index => $kls)
                                                             <div class="custom-control custom-checkbox">
                                                                 <input type="checkbox" name="semua_siswa_kelas[]"
                                                                     value="{{ $kls->id }}"
                                                                     class="custom-control-input kelas-choice"
-                                                                    id="customCheck{{ $kls->id + 99 }}"
-                                                                    {{ $jenis_pembayaran->pembayaran_untuk == 'semua kelas' ? 'checked' : '' }}
-                                                                    {{ $jenis_pembayaran->pembayaran_untuk == $kls->id ? 'checked' : '' }}>
+                                                                    id="customCheck{{ $kls->id + 99 }}" @if ($pembayaran_untuk[0] == 'semua kelas') checked
+                                                                    @elseif($pembayaran_untuk[0] == 'semua siswa kelas')
 
-                                                                <label class="custom-control-label"
-                                                                    for="customCheck{{ $kls->id + 99 }}">Semua
-                                                                    Siswa
-                                                                    {{ $kls->nama_kelas }}</label>
-                                                            </div>
-                                                        @endforeach
 
-                                                        @foreach ($unselected_kelas as $kls)
-                                                            <div class="custom-control custom-checkbox">
-                                                                <input type="checkbox" name="semua_siswa_kelas[]"
-                                                                    value="{{ $kls->id }}"
-                                                                    class="custom-control-input"
-                                                                    id="customCheck{{ $kls->id + 99 }}"
-                                                                    {{ $jenis_pembayaran->pembayaran_untuk == 'semua kelas' ? 'checked' : '' }}>
 
-                                                                <label class="custom-control-label"
-                                                                    for="customCheck{{ $kls->id + 99 }}">Semua
-                                                                    Siswa
-                                                                    {{ $kls->nama_kelas }}</label>
-                                                            </div>
-                                                        @endforeach
+
+
+                                                                    @foreach ($pembayaran_untuk[1] as $pu)
+                                                                @if ($pu == $kls->id)
+                                                                    checked
+                                                                    @php
+                                                                        $checked_semua_siswa_kelas[] = $kls->id;
+                                                                    @endphp @endif
+                                                                @endforeach
+                                                        @endif>
+
+                                                        <label class="custom-control-label"
+                                                            for="customCheck{{ $kls->id + 99 }}">Semua
+                                                            Siswa
+                                                            {{ $kls->nama_kelas }}</label>
                                                     </div>
+                                                    @endforeach
                                                 </div>
                                             </div>
                                         </div>
+                                    </div>
 
-                                        {{-- per siswa --}}
-                                        <div id="accordion">
-                                            <label class="text-dark">Per siswa</label>
+                                    {{-- per siswa --}}
+                                    <div id="accordion">
+                                        <label class="text-dark">Per siswa</label>
 
-                                            @foreach ($kelas as $kls)
-                                                <div class="accordion">
-                                                    <div class="accordion-header" role="button" data-toggle="collapse"
-                                                        data-target="#panel-body-{{ $kls->id }}">
-                                                        <h4>{{ $kls->nama_kelas }}</h4>
-                                                    </div>
-
-                                                    <div class="accordion-body accordion-body-custom collapse"
-                                                        id="panel-body-{{ $kls->id }}" data-parent="#accordion">
-
-                                                        @foreach ($kls->siswa as $sws)
-                                                            <div class="custom-control custom-checkbox">
-                                                                <input type="checkbox" name="per_siswa[]"
-                                                                    value="{{ $sws->id }}"
-                                                                    class="custom-control-input per-murid-choice"
-                                                                    id="customCheck{{ $sws->id }}" checked>
-                                                                <label class="custom-control-label"
-                                                                    for="customCheck{{ $sws->id }}">{{ $sws->nis . ' - ' . $sws->nama_lengkap }}</label>
-                                                            </div>
-                                                        @endforeach
-                                                    </div>
+                                        @foreach ($kelas as $kls)
+                                            <div class="accordion">
+                                                <div class="accordion-header" role="button" data-toggle="collapse"
+                                                    data-target="#panel-body-{{ $kls->id }}">
+                                                    <h4>{{ $kls->nama_kelas }}</h4>
                                                 </div>
-                                            @endforeach
 
-                                            @foreach ($unselected_kelas as $uk)
-                                                <div class="accordion">
-                                                    <div class="accordion-header" role="button" data-toggle="collapse"
-                                                        data-target="#panel-body-{{ $uk->id }}">
-                                                        <h4>{{ $uk->nama_kelas }}</h4>
-                                                    </div>
+                                                <div class="accordion-body accordion-body-custom collapse"
+                                                    id="panel-body-{{ $kls->id }}" data-parent="#accordion">
 
-                                                    <div class="accordion-body accordion-body-custom collapse"
-                                                        id="panel-body-{{ $uk->id }}" data-parent="#accordion">
+                                                    @foreach ($kls->siswa as $index => $sws)
+                                                        <div class="custom-control custom-checkbox">
+                                                            <input type="checkbox" name="per_siswa[]"
+                                                                value="{{ $sws->id }}"
+                                                                class="custom-control-input per-murid-choice"
+                                                                id="customCheck{{ $sws->id }}" @if ($pembayaran_untuk[0] == 'semua kelas') checked
+@elseif($pembayaran_untuk[0] == 'per siswa')
 
-                                                        @foreach ($uk->siswa as $uk_sws)
-                                                            <div class="custom-control custom-checkbox">
-                                                                <input type="checkbox" name="per_siswa[]"
-                                                                    value="{{ $uk_sws->id }}"
-                                                                    class="custom-control-input kelas-choice"
-                                                                    id="customCheck{{ $uk_sws->id }}">
-                                                                <label class="custom-control-label"
-                                                                    for="customCheck{{ $uk_sws->id }}">{{ $uk_sws->nis . ' - ' . $uk_sws->nama_lengkap }}</label>
-                                                            </div>
-                                                        @endforeach
-                                                    </div>
+
+
+
+                                                                          @foreach ($pembayaran_untuk[1] as $index=> $pu)
+
+                                                            @if ($pu == $sws->id)
+                                                                checked @endif
+                                                            @endforeach
+                                                    @endif
+                                                    @foreach ($checked_semua_siswa_kelas as $cssk)
+                                                        {{ $cssk == $sws->kelas_id ? 'checked' : '' }}
+                                                    @endforeach
+                                                    >
+                                                    <label class="custom-control-label"
+                                                        for="customCheck{{ $sws->id }}">{{ $sws->nis . ' - ' . $sws->nama_lengkap }}</label>
                                                 </div>
-                                            @endforeach
-                                        </div>
+                                        @endforeach
                                     </div>
                                 </div>
-                            </form>
+                                @endforeach
                         </div>
                     </div>
-                    <!-- /.card -->
                 </div>
+                </form>
+            </div>
+            </div>
+            <!-- /.card -->
+            </div>
             </div>
 
         </section>
@@ -228,39 +220,39 @@
 @endsection
 
 @section('scripts')
+<script>
+    $(document).ready(function() {
+        $('#tipe').select2()
+        $('#tahunajaran_id').select2()
+        $("#one").click(function() {
+            $('input:checkbox').not(this).prop('checked', this.checked);
+        });
+
+        $(".per-murid-choice").change(function() {
+            if (this.checked) {
+                $('.kelas-choice').prop('checked', false);
+            }
+        });
+
+        $(".kelas-choice").change(function() {
+            if (this.checked) {
+                $('.per-murid-choice').prop('checked', false);
+            }
+        });
+    });
+
+</script>
+@if (session()->has('success'))
     <script>
         $(document).ready(function() {
-            $('#tipe').select2()
-            $('#tahunajaran_id').select2()
-            $("#one").click(function() {
-                $('input:checkbox').not(this).prop('checked', this.checked);
-            });
-
-            $(".per-murid-choice").change(function() {
-                if (this.checked) {
-                    $('.kelas-choice').prop('checked', false);
-                }
-            });
-
-            $(".kelas-choice").change(function() {
-                if (this.checked) {
-                    $('.per-murid-choice').prop('checked', false);
-                }
+            // toastr["success"]('{{ session()->get('success') }}')
+            iziToast.success({
+                title: '',
+                message: '{{ session()->get('success') }}',
+                position: 'bottomCenter'
             });
         });
 
     </script>
-    @if (session()->has('success'))
-        <script>
-            $(document).ready(function() {
-                // toastr["success"]('{{ session()->get('success') }}')
-                iziToast.success({
-                    title: '',
-                    message: '{{ session()->get('success') }}',
-                    position: 'bottomCenter'
-                });
-            });
-
-        </script>
-    @endif
+@endif
 @endsection
