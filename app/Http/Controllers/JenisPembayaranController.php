@@ -117,25 +117,7 @@ class JenisPembayaranController extends Controller
 
         $tahun_ajaran = Tahunajaran::all();
 
-        // $siswa_id = [];
-        // foreach ($jenis_pembayaran->tagihan as $tagihan) {
-        //     $siswa_id[] = $tagihan->siswa_id;
-        // }
-
-        // dd(count($siswa_id));
-        // $unselected_siswa = Siswa::with('kelas')->whereNotIn('id', $siswa_id)->get();
-
-        // $unselected_kelas = Kelas::with('siswa')->whereHas('siswa', function ($query) use ($siswa_id) {
-        //     $query->whereNotIn('id', $siswa_id);
-        // })->get();
-
-        // $kelas = Kelas::with('siswa')->whereHas('siswa', function ($query) use ($siswa_id) {
-        //     $query->whereIn('id', $siswa_id);
-        // })->get();
-
         $kelas = Kelas::with('siswa')->get();
-        // echo json_encode($kelas);
-        // die;
 
         return view('admin.jenis_pembayaran.edit', compact('jenis_pembayaran', 'tahun_ajaran', 'kelas', 'pembayaran_untuk'));
     }
@@ -151,7 +133,6 @@ class JenisPembayaranController extends Controller
     {
         $update  = $request->validated();
         $jenis_pembayaran = JenisPembayaran::with('tagihan')->findOrFail($id);
-        $jenis_pembayaran->update(['pembayaran_untuk' => '']);
 
         $this->deleteTagihanAndDetailTagihan($id);
 
@@ -166,6 +147,8 @@ class JenisPembayaranController extends Controller
 
             $this->createOrUpdateBatchTagihan($siswa, $request, $jenis_pembayaran, ['semua kelas']);
 
+            $jenis_pembayaran->update($update);
+
             session()->flash('success', 'Data Berhasil Diupdate');
 
             return redirect(route('jenispembayaran.index'));
@@ -178,6 +161,8 @@ class JenisPembayaranController extends Controller
 
             $this->createOrUpdateBatchTagihan($siswa, $request, $jenis_pembayaran, ['semua siswa kelas', $request->semua_siswa_kelas]);
 
+            $jenis_pembayaran->update($update);
+
             session()->flash('success', 'Data Berhasil Diupdate');
 
             return redirect(route('jenispembayaran.index'));
@@ -187,6 +172,8 @@ class JenisPembayaranController extends Controller
             $siswa = Siswa::whereIn('id', $request->per_siswa)->where('status', 'Aktif')->get()->pluck('id');
 
             $this->createOrUpdateBatchTagihan($siswa, $request, $jenis_pembayaran, ['per siswa', $request->per_siswa]);
+
+            $jenis_pembayaran->update($update);
 
             session()->flash('success', 'Data Berhasil Diupdate');
 
