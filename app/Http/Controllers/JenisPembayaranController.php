@@ -67,7 +67,7 @@ class JenisPembayaranController extends Controller
 
             $siswa = Siswa::whereIn('kelas_id', $semua_kelas)->where('status', 'Aktif')->get()->pluck('id');
 
-            $this->insertTagihan($siswa, $request, ['semua kelas']);
+            $this->createOrUpdateBatchTagihan($siswa, $request, 'new', ['semua kelas']);
 
             session()->flash('success', 'Data Berhasil Disimpan');
 
@@ -80,7 +80,7 @@ class JenisPembayaranController extends Controller
 
             $siswa = Siswa::whereIn('kelas_id', $kelas)->where('status', 'Aktif')->get()->pluck('id');
 
-            $this->insertTagihan($siswa, $request, $request->semua_siswa_kelas);
+            $this->createOrUpdateBatchTagihan($siswa, $request, 'new', $request->semua_siswa_kelas);
 
             session()->flash('success', 'Data Berhasil Disimpan');
 
@@ -92,7 +92,7 @@ class JenisPembayaranController extends Controller
 
             $siswa = Siswa::whereIn('id', $request->per_siswa)->where('status', 'Aktif')->get()->pluck('id');
 
-            $this->insertTagihan($siswa, $request, ['per siswa']);
+            $this->createOrUpdateBatchTagihan($siswa, $request, 'new', ['per siswa']);
 
             session()->flash('success', 'Data Berhasil Disimpan');
 
@@ -101,18 +101,22 @@ class JenisPembayaranController extends Controller
     }
 
 
-    public function insertTagihan($siswa, $request, $pembayaran_untuk)
+    public function createOrUpdateBatchTagihan($siswa, $request, $jenis_pembayaran, $pembayaran_untuk)
     {
         $bulan = \BulanHelper::getBulan();
 
-        $jenis_pembayaran = JenisPembayaran::create([
-            'nama_pembayaran' => $request->nama_pembayaran,
-            'tahunajaran_id' => $request->tahunajaran_id,
-            'tipe' => $request->tipe,
-            'harga' => $request->harga,
-            // array to string
-            'pembayaran_untuk' => implode(", ", $pembayaran_untuk),
-        ]);
+        if ($jenis_pembayaran == 'new') {
+            $jenis_pembayaran = JenisPembayaran::create([
+                'nama_pembayaran' => $request->nama_pembayaran,
+                'tahunajaran_id' => $request->tahunajaran_id,
+                'tipe' => $request->tipe,
+                'harga' => $request->harga,
+                // array to string
+                'pembayaran_untuk' => implode(", ", $pembayaran_untuk),
+            ]);
+        } else {
+            $jenis_pembayaran->update(['pembayaran_untuk' => implode(", ", $pembayaran_untuk)]);
+        }
 
         /**
          * cek sudah ada tagihan atau belum
@@ -187,7 +191,7 @@ class JenisPembayaranController extends Controller
             $siswa_id[] = $tagihan->siswa_id;
         }
 
-        // dd($siswa_id);
+        // dd(count($siswa_id));
         // $unselected_siswa = Siswa::with('kelas')->whereNotIn('id', $siswa_id)->get();
 
         $unselected_kelas = Kelas::with('siswa')->whereHas('siswa', function ($query) use ($siswa_id) {
@@ -213,116 +217,49 @@ class JenisPembayaranController extends Controller
      */
     public function update(StoreJenisPembayaranRequest $request, $id)
     {
-        dd($request->all());
+        $update  = $request->validated();
+        $jenis_pembayaran = JenisPembayaran::with('tagihan')->findOrFail($id);
+        $jenis_pembayaran->update(['pembayaran_untuk' => '']);
 
-        $bulan = \BulanHelper::getBulan();
+        $this->deleteTagihanAndDetailTagihan($id);
 
-        $jenisPembayaran = JenisPembayaran::findOrFail($id);
+        if ($request->has('semua_kelas')) {
+            // update jenis pembayaran
+            $update['pembayaran_untuk'] = 'semua kelas';
+            $jenis_pembayaran->update($update);
 
-        $jenisPembayaran->update($request->validated());
+            $semua_kelas = Kelas::pluck('id')->all();
 
-        $tagihan = Tagihan::with('tagihan_detail')->where('jenis_pembayaran_id', $jenisPembayaran->id)->get();
+            $siswa = Siswa::whereIn('kelas_id', $semua_kelas)->where('status', 'Aktif')->get()->pluck('id');
 
+            $this->createOrUpdateBatchTagihan($siswa, $request, $jenis_pembayaran, $request->semua_siswa_kelas);
 
-        if ($request->old_tipe !== $request->tipe) {
-            // hapus tagihan detail
-            foreach ($tagihan as $item) {
-                $tagihanDetail = TagihanDetail::where('tagihan_id', $item->id)->delete();
-            }
-        } else {
-            foreach ($tagihan as $item) {
-                $tagihanDetail = TagihanDetail::where('tagihan_id', $item->id);
-                $tagihanDetail->update(['sisa' => $request->harga]);
-            }
+            session()->flash('success', 'Data Berhasil Diupdate');
+
+            return redirect(route('jenispembayaran.index'));
         }
 
-        // if(!empty($request->kelas_id)){
-        foreach ($request->kelas_id as $item) {
+        if ($request->has('semua_siswa_kelas')) {
+            $kelas = Kelas::whereIn('id', $request->semua_siswa_kelas)->pluck('id')->all();
 
+            $siswa = Siswa::whereIn('kelas_id', $kelas)->where('status', 'Aktif')->get()->pluck('id');
 
-            if ($item !== 'semua') {
-                $siswa = Siswa::where('kelas_id', $item)->where('status', 'Aktif')->get();
+            $this->createOrUpdateBatchTagihan($siswa, $request, $jenis_pembayaran, $request->semua_siswa_kelas);
 
-                $no = 1;
-                foreach ($siswa as $s) {
-                    //cek sudah ada tagihan atau belum
-                    $cek = Siswa::whereHas('tagihan', function ($query) use ($jenisPembayaran) {
-                        $query->where('jenis_pembayaran_id', $jenisPembayaran->id);
-                    });
-                    $cek = $cek->where('id', $s->id)->get()->first();
+            session()->flash('success', 'Data Berhasil Diupdate');
 
-                    if (empty($cek)) {
-                        $tagihan = Tagihan::create([
-                            'siswa_id' => $s->id,
-                            'jenis_pembayaran_id' => $jenisPembayaran->id,
-                        ]);
-
-                        if ($request->tipe === "bulanan") {
-                            foreach ($bulan as $b) {
-                                TagihanDetail::create([
-                                    'tagihan_id' => $tagihan->id,
-                                    'status' => 'Belum Lunas',
-                                    'keterangan' => $b,
-                                    'total_bayar' => 0,
-                                    'sisa' => $jenisPembayaran->harga,
-                                ]);
-                            }
-                        } else {
-                            TagihanDetail::create([
-                                'tagihan_id' => $tagihan->id,
-                                'status' => 'Belum Lunas',
-                                'keterangan' => 'Bebas',
-                                'total_bayar' => 0,
-                                'sisa' => $jenisPembayaran->harga,
-                            ]);
-                        }
-                    } else {
-                        if ($request->old_tipe !== $request->tipe) {
-                            $tagihanCari = Tagihan::where('siswa_id', $s->id)->where('jenis_pembayaran_id', $jenisPembayaran->id)->get()->first();
-
-                            if ($request->tipe === "bulanan") {
-                                foreach ($bulan as $b) {
-                                    TagihanDetail::create([
-                                        'tagihan_id' => $tagihanCari->id,
-                                        'status' => 'Belum Lunas',
-                                        'keterangan' => $b,
-                                        'total_bayar' => 0,
-                                        'sisa' => $jenisPembayaran->harga,
-                                    ]);
-                                }
-                            } else {
-                                TagihanDetail::create([
-                                    'tagihan_id' => $tagihanCari->id,
-                                    'status' => 'Belum Lunas',
-                                    'keterangan' => 'Bebas',
-                                    'total_bayar' => 0,
-                                    'sisa' => $jenisPembayaran->harga,
-                                ]);
-                            }
-                        }
-                    }
-                }
-            }
+            return redirect(route('jenispembayaran.index'));
         }
 
-        foreach ($request->old_kelas_id as $item) {
-            if (!in_array($item, $request->kelas_id)) {
-                $siswa = Siswa::where('kelas_id', $item)->get();
+        if ($request->has('per_siswa')) {
+            $siswa = Siswa::whereIn('id', $request->per_siswa)->where('status', 'Aktif')->get()->pluck('id');
 
-                foreach ($siswa as $s) {
-                    $tagihan = Tagihan::where('jenis_pembayaran_id', $id)->where('siswa_id', $s->id)->each(function ($tagihan) {
-                        TagihanDetail::where('tagihan_id', $tagihan->id)->delete();
-                        $tagihan->delete();
-                    });
-                }
-            }
+            $this->createOrUpdateBatchTagihan($siswa, $request, $jenis_pembayaran, $request->per_siswa);
+
+            session()->flash('success', 'Data Berhasil Diupdate');
+
+            return redirect(route('jenispembayaran.index'));
         }
-        // }
-
-        session()->flash('success', "Data Berhasil Diubah!");
-
-        //redirect user
-        return redirect(route('jenispembayaran.index'));
     }
 
     /**
@@ -338,17 +275,26 @@ class JenisPembayaranController extends Controller
         if ($jenisPembayaran->lunas > 0 || $jenisPembayaran->total_byr > 0) {
             session()->flash('error', "Gagal menghapus $jenisPembayaran->nama_pembayaran !!");
         } else {
-            $tagihan = Tagihan::where('jenis_pembayaran_id', $id)->each(function ($tagihan) {
-                TagihanDetail::where('tagihan_id', $tagihan->id)->delete();
-                $tagihan->delete();
-            });
-
-            $jenisPembayaran->delete();
+            $this->deleteTagihanAndDetailTagihan($id);
+            JenisPembayaran::findOrFail($id)->delete();
 
             session()->flash('success', "Data Berhasil Dihapus!");
         }
 
         //redirect user
         return redirect(route('jenispembayaran.index'));
+    }
+
+    public function deleteTagihanAndDetailTagihan($id)
+    {
+        $tagihan_lama = Tagihan::where('jenis_pembayaran_id', $id)->get();
+
+        $tagihan_lama_id = [];
+        foreach ($tagihan_lama as $tl) {
+            $tagihan_lama_id[] = $tl->id;
+        }
+
+        TagihanDetail::whereIn('tagihan_id', $tagihan_lama_id)->delete();
+        Tagihan::where('jenis_pembayaran_id', $id)->delete();
     }
 }

@@ -27,5 +27,4 @@ class Tagihan extends Model
     {
         return $this->hasMany(TagihanDetail::class);
     }
-
 }

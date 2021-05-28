@@ -25,27 +25,27 @@ class JenisPembayaran extends Model
     public function getLunasAttribute()
     {
         $lunas = Tagihan::where('jenis_pembayaran_id', $this->attributes['id'])
-                    ->whereHas('tagihan_detail', function ($query) {
-                        $query->where('status', 'Lunas');
-                    })->count();
+            ->whereHas('tagihan_detail', function ($query) {
+                $query->where('status', 'Lunas');
+            })->count();
         return $lunas;
     }
 
     public function getBelumLunasAttribute()
     {
         $blunas = Tagihan::where('jenis_pembayaran_id', $this->attributes['id'])
-                    ->whereHas('tagihan_detail', function ($query) {
-                        $query->where('status', 'Belum Lunas');
-                    })->count();
+            ->whereHas('tagihan_detail', function ($query) {
+                $query->where('status', 'Belum Lunas');
+            })->count();
         return $blunas;
     }
 
     public function getTotalByrAttribute()
     {
         $totayByr = Tagihan::where('jenis_pembayaran_id', $this->attributes['id'])
-                    ->whereHas('tagihan_detail', function ($query) {
-                        $query->where('total_bayar', '<>', 0);
-                    })->count();
+            ->whereHas('tagihan_detail', function ($query) {
+                $query->where('total_bayar', '<>', 0);
+            })->count();
         return $totayByr;
     }
 }
