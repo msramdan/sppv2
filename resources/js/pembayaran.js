@@ -1,4 +1,4 @@
-import Vue from 'vue'
+ import Vue from 'vue'
 import axios from 'axios'
 import Autocomplete from '@trevoreyre/autocomplete-vue'
 import '@trevoreyre/autocomplete-vue/dist/style.css'
@@ -34,7 +34,7 @@ new Vue({
         },
         showError: false,
         msgError: '',
-        
+
     },
     watch: {
         'tmp.harga': function() {
@@ -53,12 +53,12 @@ new Vue({
     methods: {
         search(input) {
             const url = `../getSiswa?keyword=${input}`
-            
+
             return new Promise(resolve => {
             if (input.length < 3) {
                 return resolve([])
             }
-    
+
             fetch(url)
                 .then(response => response.json())
                 .then(data => {
@@ -70,19 +70,19 @@ new Vue({
             return `[${result.nis}] ${result.nama_lengkap} ${result.kelas.nama_kelas}`
         },
         handleSubmit(result) {
-            
+
             this.dataSiswa = true
             this.siswa = result
             this.getTagihan(result.id)
             this.removeAllCart()
-            
+
         },
         getTagihan(id) {
             axios.get(`../getTagihan/${id}`)
             .then((response) => {
                 // console.log(response.data)
                 this.tagihan = response.data
-                
+
             })
         },
         addToCart(id, harga, jenis, keterangan, tipe){
@@ -119,7 +119,7 @@ new Vue({
             .then((res) => {
                 // console.log(res)
                 Fire.$emit('afterAddCart')
-                
+
                 this.submitCart = false
                 this.submit[id] = false
             })
@@ -145,8 +145,8 @@ new Vue({
             this.tmp.sisa = harga
             this.tmp.jenis = jenis
             this.tmp.keterangan = keterangan
-            
-        },      
+
+        },
         bayarAngsuranSubmit(){
             if(parseInt(this.tmp.harga) <= 10000){
                 this.showError = true
@@ -158,7 +158,7 @@ new Vue({
             }
             this.showModalAngsuran = false;
             this.addToCart(this.tmp.id, this.tmp.harga, this.tmp.jenis, this.tmp.keterangan, 1)
-        },      
+        },
         storePembayaran(siswaId){
             console.log('store pembayaran')
             this.simpanBtn = true
@@ -180,7 +180,7 @@ new Vue({
             .catch((err) => {
                 console.log(err)
             })
-        },      
+        },
 
     },
     created() {

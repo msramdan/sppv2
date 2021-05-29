@@ -15,7 +15,7 @@ class CreateTagihanDetailsTable extends Migration
     {
         Schema::create('tagihan_details', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('tagihan_id')->constrained('tagihan');
+            $table->foreignId('tagihan_id')->constrained('tagihan')->onDelete('cascade');
             $table->string('status');
             $table->integer('total_bayar');
             $table->integer('sisa');

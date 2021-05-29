@@ -14,7 +14,7 @@ class AddPembayaranUntukToJenisPembayaranTable extends Migration
     public function up()
     {
         Schema::table('jenis_pembayaran', function (Blueprint $table) {
-            $table->string('pembayaran_untuk')->nullable()->after('tipe');
+            $table->json('pembayaran_untuk')->nullable()->after('tipe');
         });
     }
 
