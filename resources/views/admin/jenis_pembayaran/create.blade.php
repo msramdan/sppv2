@@ -117,6 +117,7 @@
                                         <br>
 
                                         <label class="text-dark">Per Kelas</label>
+
                                         <div class="accordion">
                                             <div class="accordion-header" role="button" data-toggle="collapse"
                                                 data-target="#panel-body-kelas">
@@ -148,7 +149,6 @@
                                                 </div>
                                             </div>
                                         </div>
-
 
                                         <div id="accordion">
                                             <label class="text-dark">Per siswa</label>
@@ -203,13 +203,13 @@
 
             $(".per-murid-choice").change(function() {
                 if (this.checked) {
-                    $('.kelas-choice').prop('checked', false);   
+                    $('.kelas-choice').prop('checked', false);
                 }
             });
 
             $(".kelas-choice").change(function() {
                 if (this.checked) {
-                    $('.per-murid-choice').prop('checked', false);   
+                    $('.per-murid-choice').prop('checked', false);
                 }
             });
         });
