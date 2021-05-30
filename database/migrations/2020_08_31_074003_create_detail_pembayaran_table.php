@@ -20,6 +20,8 @@ class CreateDetailPembayaranTable extends Migration
             $table->string('nama_pembayaran');
             $table->string('keterangan');
             $table->integer('harga');
+            $table->integer('total_bayar')->nullable();
+            $table->integer('sisa')->nullable();
             $table->timestamps();
         });
     }

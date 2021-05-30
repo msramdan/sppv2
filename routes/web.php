@@ -87,12 +87,12 @@ Route::group(['middleware' => 'auth'], function () {
 
     //transaksi pembayaran
     Route::group(['middleware' => ['permission:manajemen transaksi pembayaran']], function () {
-        Route::view('pembayaran/transaksi', 'admin.pembayaran.transaksi');
+        Route::view('pembayaran/transaksi', 'admin.pembayaran.transaksi')->name('pembayaran.transaksi');
 
 
         Route::get('/getSiswa', 'Admin\TransaksiPembayaranController@getSiswa');
         Route::get('/getTagihan/{id}', 'Admin\TransaksiPembayaranController@getTagihan');
-        Route::resource('/pembayaran', 'Admin\TransaksiPembayaranController');
+        Route::resource('/pembayaran', 'Admin\TransaksiPembayaranController')->except('create');
 
         Route::get('/cart/addCart', 'Admin\CartController@addCart');
         Route::get('/cart/removeCart', 'Admin\CartController@removeCart');

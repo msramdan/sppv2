@@ -19,12 +19,12 @@ class CartController extends Controller
      */
     public function index()
     {
-        
+
         $cartItems = Cart::content();
         $cartTotal = Cart::total();
 
         // return Cart::content();
-        return response()->json(['cartItems' => $cartItems, 'cartTotal' => $cartTotal ], 200);
+        return response()->json(['cartItems' => $cartItems, 'cartTotal' => $cartTotal], 200);
     }
 
     /**
@@ -35,16 +35,16 @@ class CartController extends Controller
      */
     public function store(Request $request)
     {
-        
+
         $cartItems = Cart::content();
         $cartTotal = Cart::total();
         $totalQty = Cart::count();
-        
+
         DB::beginTransaction();
-        try {         
-            
-            $kode = 'LKT-'.rand();
-            //menyimpan data ke table 
+        try {
+
+            $kode = 'LKT-' . rand();
+            //menyimpan data ke table
             $pembayaran = TransaksiPembayaran::create([
                 'siswa_id' => $request->siswaId,
                 'kode_pembayaran' => $kode,
@@ -54,45 +54,43 @@ class CartController extends Controller
                 'users_id' => auth()->user()->id,
             ]);
 
-                
-            
+
             foreach ($cartItems as $row) {
                 // dd($row->id);
                 $tagihanDetail = TagihanDetail::findOrFail($row->id);
-                
+
                 $totalBayar = $tagihanDetail->total_bayar + $row->price;
                 $sisaBayar = $tagihanDetail->sisa - $row->price;
-                
+
                 $tagihanDetail->total_bayar = $totalBayar;
                 $tagihanDetail->sisa = $sisaBayar;
 
-                if($sisaBayar == 0){
+                if ($sisaBayar == 0) {
                     $tagihanDetail->status = "Lunas";
                 }
 
                 $tagihanDetail->update();
-                
+
                 $tes = $pembayaran->detail_pembayaran()->create([
                     'nama_pembayaran' => $row->name,
                     'keterangan' => $row->options->keterangan,
                     'harga' => $row->price,
                     'tagihan_details_id' => $row->id,
                 ]);
-
             }
             //apabila tidak terjadi error, penyimpanan diverifikasi
             DB::commit();
 
-            
+
             Cart::destroy();
 
             //me-return status dan message berupa code invoice, dan menghapus cookie
             return response()->json([
                 'status' => 'success',
-                
+
             ], 200);
         } catch (\Exception $e) {
-            //jika ada error, maka akan dirollback sehingga tidak ada data yang tersimpan 
+            //jika ada error, maka akan dirollback sehingga tidak ada data yang tersimpan
             DB::rollback();
             //pesan gagal akan di-return
             return response()->json([
@@ -103,7 +101,7 @@ class CartController extends Controller
         // return response()->json(['message' => 'berhasil disimpan'], 200);
     }
 
-    public function addCart(Request $request) 
+    public function addCart(Request $request)
     {
         $cartItem = Cart::add([
             'id' => $request->id,
@@ -122,22 +120,22 @@ class CartController extends Controller
         return response()->json($cartItem, 200);
     }
 
-    public function removeCart(){
+    public function removeCart()
+    {
 
         //hancurkan cart haha , maksudnya hapus data yang ada di dalam cart
         $cartItem = Cart::destroy();
 
-        if(empty($cartItem)){
-            return response()->json(['message' => 'Item di Cart berhasil dihapus semua'], 200);    
-        }else{
+        if (empty($cartItem)) {
+            return response()->json(['message' => 'Item di Cart berhasil dihapus semua'], 200);
+        } else {
             return response()->json(['message' => 'Item di Cart gagal dihapus semua'], 500);
         }
     }
 
-    public function deleteItem($rowId){
+    public function deleteItem($rowId)
+    {
         $deleteItem = Cart::remove($rowId);
         return response()->json(['message' => 'Item Cart Berhasil Dihapus'], 200);
     }
-
-    
 }

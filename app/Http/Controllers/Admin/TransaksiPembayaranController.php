@@ -114,6 +114,9 @@ class TransaksiPembayaranController extends Controller
     {
         $detail = TransaksiPembayaran::with('siswa', 'detail_pembayaran', 'user')->findOrFail($id);
         // return $detail;
+
+        // echo json_encode($detail);
+        // die;
         return view('admin.pembayaran.detail', compact('detail'));
     }
 

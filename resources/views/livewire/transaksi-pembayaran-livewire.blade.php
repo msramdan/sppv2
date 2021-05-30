@@ -1,8 +1,16 @@
 <div>
     <div class="col-md-9 mx-auto">
         <div class="form-group">
-            <input type="text" class="form-control form-control-lg" placeholder="Masukkan NIS/Nama Siswa"
-                wire:model="search" autofocus>
+            <div class="input-group mb-2">
+                <div class="input-group-prepend">
+                    <div class="input-group-text">
+                        <i class="fas fa-search"></i>
+                    </div>
+                </div>
+                <input type="text" class="form-control" placeholder="Masukkan NIS/Nama Siswa" wire:model="search"
+                    autofocus>
+            </div>
+
 
             @if ($siswa && $search)
                 <div class="p-1 rounded mb-0"
@@ -30,29 +38,30 @@
             @endif
         </div>
     </div>
-    @dump(\Cart::getContent())
+    {{-- @dump(\Cart::getContent()) --}}
 
     {{-- info siswa --}}
     @if ($selected_siswa)
-        <div class="row">
 
-            <div class="col-md-2">
-                <div class="user-item">
-                    <img alt="image" height="128px" width="128px" src="../img/siswa/{{ $selected_siswa->foto }}"
-                        class="img-fluid">
-                    <div class="user-details">
-                        <div class="user-name">{{ $selected_siswa->nama_lengkap }}</div>
-                        <div class="text-job text-muted">{{ $selected_siswa->nis }}</div>
-                        <div class="user-cta">
-                            <button class="btn btn-primary follow-btn">{{ $selected_siswa->status }}</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
+        <div class="row mt-5">
 
             <div class="col-md-6">
+                <div class="row mb-3">
+                    <div class="col-md-3">
+                        <img alt="image" width="100%" src="../img/siswa/{{ $selected_siswa->foto }}"
+                            class="img-fluid">
+                    </div>
+                    <div class="col-md-8">
+                        <p class="mb-0 mt-0 font-weight-bold">Nama : {{ $selected_siswa->nama_lengkap }}</p>
+                        <p class="mb-0">NIS: {{ $selected_siswa->nis }}</p>
+                        <p class="mb-0">Kelas: {{ $selected_siswa->nis }}</p>
+                        <p class="mb-0">Status: {{ $selected_siswa->status }}</p>
+                    </div>
+                </div>
+
+
                 <div id="accordion">
-                    <label class="text-dark">Per siswa</label>
+                    <label class="font-weight-bold">Tagihan</label>
                     @foreach ($tagihan as $tgh)
                         <div class="accordion">
                             <div class="accordion-header mb-2" role="button" data-toggle="collapse"
@@ -75,7 +84,7 @@
                                                             <strong>Rp.{{ number_format($tgh->jenis_pembayaran->harga) }}</strong>
                                                             <br>
 
-                                                            <span>Total Bayar </span>
+                                                            <span>Dibayar </span>
                                                             <strong
                                                                 class="text-success">Rp.{{ number_format($td->total_bayar) }}</strong>
                                                             <br>
@@ -90,18 +99,18 @@
                                                     </div>
 
                                                     @if ($td->status == 'Lunas')
-                                                        <button class="btn btn-success btn-sm btn-block">
+                                                        <button class="btn btn-success btn-sm btn-block" disabled>
                                                             <i class="fas fa-thumbs-up"></i>
                                                             Lunas
                                                         </button>
                                                     @else
                                                         <button class="btn btn-info btn-sm btn-block" @forelse (\Cart::getContent() as $cart)  @if ($cart->id
                                                             !=$td->id)
-                                                            wire:click="addToCard({{ $td->id }})"
+                                                            wire:click="showModal({{ $td->id }})"
                                                         @else
                                                             disabled @endif
                                                             @empty
-                                                                wire:click="addToCard({{ $td->id }})"
+                                                                wire:click="showModal({{ $td->id }})"
                                                         @endforelse>
                                                         <i class="fas fa-money-bill-wave"></i>
                                                         Bayar
@@ -118,7 +127,7 @@
                                     <strong>Rp.{{ number_format($tgh->jenis_pembayaran->harga) }}</strong>
                                     <br>
 
-                                    <span>Total Bayar </span>
+                                    <span>Dibayar </span>
                                     <strong class="text-success">Rp.{{ number_format($td->total_bayar) }}</strong>
                                     <br>
 
@@ -128,18 +137,18 @@
 
                                     <div class="mt-2">
                                         @if ($td->status == 'Lunas')
-                                            <button class="btn btn-success btn-sm btn-block">
+                                            <button class="btn btn-success btn-sm btn-block" disabled>
                                                 <i class="fas fa-thumbs-up"></i>
                                                 Lunas
                                             </button>
                                         @else
                                             <button class="btn btn-info btn-sm btn-block" @forelse (\Cart::getContent() as $cart)
                                                 @if ($cart->id !=$td->id)
-                                                wire:click="addToCard({{ $td->id }})"
+                                                wire:click="showModal({{ $td->id }})"
                                             @else
                                                 disabled @endif
                                             @empty
-                                                wire:click="addToCard({{ $td->id }})"
+                                                wire:click="showModal({{ $td->id }})"
                                         @endforelse>
                                         <i class="fas fa-money-bill-wave"></i>
                                         Bayar
@@ -161,9 +170,9 @@
     </div>
 
 
-    <div class="col-md-4">
+    <div class="col-md-6">
         {{-- @{{tagihan_id}} --}}
-        <div class="card card-info pembayaranDetail">
+        <div class="card card-info">
 
             <div class="card-body">
 
@@ -172,33 +181,68 @@
                                 <span class="sr-only">Loading...</span>
                             </div> --}}
 
-                @forelse (\Cart::getContent() as $cart)
-                    <div class="d-flex justify-content-between border-bottom">
-                        <div>
-                            <p class="mb-0">{{ $cart->name }}</p>
-                            <p>{{ $cart->attributes->keterangan }}</p>
-                        </div>
-                        <div>
-                            Rp. {{ number_format($cart->price) }}
-                            <button class="btn text-danger" wire:click="removeCart({{ $cart->id }})"><i
-                                    class="fas fa-times-circle"></i></button>
-                        </div>
-                    </div>
-                @empty
-                    <div class="d-flex justify-content-center">
-                        <img alt="image" style="opacity: 0.3" height="90px" width="90px"
-                            src="../img/undraw_empty_cart_co35.png">
-                    </div>
-                @endforelse
-                {{-- $cart as $c --}}
+                <table class="table table-sm table-hover table-striped m-0">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Pembayaran</th>
+                            <th>Nominal</th>
+                            <th>Dibayar</th>
+                            <th>Sisa</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
 
+                    <tbody>
+                        @php
+                            $sub_dibayar = 0;
+                        @endphp
+                        @forelse (\Cart::getContent() as $cart)
+                            @php
+                                $sub_dibayar += $cart->attributes->dibayar;
+                            @endphp
+                            <tr>
+                                <td>{{ $loop->iteration }}</td>
+                                <td>
+                                    <p class="mb-0">{{ $cart->name }}</p>
+                                    <p>{{ $cart->attributes->keterangan }}</p>
+                                </td>
+                                <td>
+                                    <p>Rp. {{ number_format($cart->price) }}</p>
+                                </td>
+                                <td>
+                                    <p>Rp. {{ number_format($cart->attributes->dibayar) }}</p>
+                                </td>
+                                <td>
+                                    <p>Rp. {{ number_format($cart->attributes->sisa) }}</p>
+                                </td>
+                                <td>
+                                    <button class="btn btn-transparent" wire:click="removeCart({{ $cart->id }})">
+                                        <i class="fas fa-times-circle text-danger"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="6" class="text-center">
+                                    <img alt="image" style="opacity: 0.3" height="90px" width="90px"
+                                        src="../img/undraw_empty_cart_co35.png">
+                                </td>
+                            </tr>
+                        @endforelse
+
+                    </tbody>
+                </table>
+
+                {{-- \Cart::getContent() as $cart --}}
                 <div class="py-4 ">
                     <h6>Total Bayar</h6>
-                    <h4>Rp. {{ number_format(\Cart::getTotal()) }}</h4>
+                    <h4>Rp. {{ number_format($sub_dibayar) }}</h4>
                 </div>
 
-                <button class="btn btn- {{ \Cart::getTotal() == 0 ? 'btn-dark' : 'btn-primary' }} btn-block"
-                    {{ \Cart::getTotal() == 0 ? 'disabled' : '' }}>Lanjutkan
+                <button class="btn btn- {{ $sub_dibayar == 0 ? 'btn-dark' : 'btn-primary' }} btn-block"
+                    wire:click="saveTransaksi({{ \Cart::getContent() }})"
+                    {{ $sub_dibayar == 0 ? 'disabled' : '' }}>Lanjutkan
                     Pembayaran</button>
 
             </div>
@@ -207,6 +251,73 @@
     <!-- /.col-md -->
 
     </div>
+
+@else
+    <div class="col-md-6 mx-auto">
+        <img class="w-75" style="opacity: 0.3" src="{{ asset('/img/undraw_file_searching_duff.png') }}" alt="">
+    </div>
     @endif
     {{-- ($selected_siswa --}}
+
+
+    @if ($modal)
+        <div class="modal-mask">
+            <div class="modal-wrapper">
+                <div class="modal-dialog shadow" role="document">
+                    <div class="modal-content">
+                        <div class="modal-body mb-0">
+                            <div class="form-group">
+                                <label for="nama-pembayaran">Nama Pembayaran</label>
+                                <input id="nama-pembayaran" type="text" class="form-control" wire:model="nama_pembayaran"
+                                    disabled>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="keterangan">Keterangan</label>
+                                <input id="keterangan" type="text" class="form-control" wire:model="keterangan" disabled>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="nominal">Nominal</label>
+                                <input id="nominal" type="text" class="form-control" wire:model="nominal_string" disabled>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="dibayar">Dibayar</label>
+                                <input id="dibayar" type="number"
+                                    class="form-control{{ $error_message ? ' is-invalid' : '' }}" wire:model="dibayar"
+                                    autofocus>
+                                <small class="text-danger">
+                                    {{ $error_message ? $error_message : '' }}
+                                </small>
+                            </div>
+
+                            <button type="button" class="btn btn-danger mt-2 btn-block"
+                                wire:click="closeModal()">Tutup</button>
+                            <button type="button" class="btn btn-primary btn-block" wire:click="addToCart()">
+                                {{-- <span v-if="simpanBtn" class="spinner-border spinner-border-sm" role="status"
+                                    aria-hidden="true"></span>
+                                Proses... --}}
+                                Tambahkan ke keranjang
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    @endif
+
+
+    @if ($flash_message)
+        <script>
+            $(document).ready(function() {
+                iziToast.success({
+                    title: '',
+                    message: 'Transaksi Pembayaran Berhasil Disimpan',
+                    position: 'bottomCenter'
+                });
+            });
+
+        </script>
+    @endif
     </div>

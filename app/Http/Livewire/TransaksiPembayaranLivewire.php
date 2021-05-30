@@ -8,11 +8,14 @@ use Livewire\Component;
 use App\JenisPembayaran;
 use Illuminate\Support\Str;
 use App\Models\TagihanDetail;
+use Illuminate\Support\Facades\DB;
+use App\Models\TransaksiPembayaran;
 use Gloudemans\Shoppingcart\Facades\Cart;
+
 
 class TransaksiPembayaranLivewire extends Component
 {
-    public $siswa, $selected_siswa, $tagihan, $cart = [];
+    public $tagihan_id, $siswa, $selected_siswa, $tagihan, $dibayar, $sisa, $nominal, $nominal_string, $keterangan, $nama_pembayaran, $error_message, $flash_message, $modal = false, $cart = [];
 
     public $search = '';
 
@@ -25,6 +28,7 @@ class TransaksiPembayaranLivewire extends Component
     {
         $this->search = '';
         $this->siswa = '';
+        $this->flash_message = '';
     }
 
     protected $queryString = [
@@ -52,68 +56,137 @@ class TransaksiPembayaranLivewire extends Component
 
         $this->search = '';
         $this->siswa = '';
+        $this->flash_message = '';
 
         Cart::session(auth()->id())->clear();
     }
 
-    public function addToCard($id)
+    public function addToCart()
     {
-        // $tagihan = Tagihan::with('jenis_pembayaran', 'tagihan_detail')->whereHas('tagihan_detail', function ($q) use ($id) {
-        //     $q->where('id', $id)->limit(1);
-        // })->first();
+        if ($this->dibayar == '') {
+            $this->error_message = 'Dibayar tidak boleh kosong!';
+        } else {
+            // $sisa = $this->sisa - $this->dibayar;
+            // if ($sisa <= 0) {
+            //     $sisa = 0;
+            //     $this->dibayar = $this->nominal;
+            // }
+
+            Cart::session(auth()->id())->add([
+                'id' => $this->tagihan_id,
+                'name' => $this->nama_pembayaran,
+                'price' => $this->nominal,
+                'quantity' => 1,
+                'attributes' => [
+                    'keterangan' => $this->keterangan,
+                    'dibayar' => $this->dibayar,
+                    'sisa' => $this->sisa - $this->dibayar,
+                ],
+            ]);
+
+            $this->closeModal();
+        }
+    }
+
+    public function showModal($id)
+    {
+        // $this->tagihan_id = '';
+        // $this->nama_pembayaran = '';
+        // $this->nominal = '';
+        // $this->keterangan = '';
+        // $this->sisa = '';
+        $this->dibayar = '';
+        $this->error_message = '';
+        $this->modal = true;
 
         $tagihan_detail = TagihanDetail::with('tagihan')->findOrFail($id);
 
         $jenis_pembayaran = JenisPembayaran::findOrFail($tagihan_detail->tagihan->jenis_pembayaran_id);
 
-        if (count($this->cart) > 0) {
-            foreach ($this->cart as $c) {
-                if ($c->id != $id) {
-                    // add the product to cart
-                    Cart::session(auth()->id())->add([
-                        'id' => $id,
-                        'name' => $jenis_pembayaran->nama_pembayaran,
-                        'price' => $tagihan_detail->sisa,
-                        'quantity' => 1,
-                        'attributes' => ['keterangan' => $tagihan_detail->keterangan],
-                        // 'associatedModel' => $tagihan
-                    ]);
-                }
-            }
-        } else {
-            Cart::session(auth()->id())->add([
-                'id' => $id,
-                'name' => $jenis_pembayaran->nama_pembayaran,
-                'price' => $tagihan_detail->sisa,
-                'quantity' => 1,
-                'attributes' => ['keterangan' => $tagihan_detail->keterangan]
-            ]);
+        // $this->sisa = $tagihan_detail->sisa;
+
+        $this->tagihan_id = $id;
+        $this->nama_pembayaran = $jenis_pembayaran->nama_pembayaran;
+        $this->nominal = $tagihan_detail->sisa;
+        $this->nominal_string = 'Rp. ' . number_format($tagihan_detail->sisa);
+        $this->keterangan = $tagihan_detail->keterangan;
+        $this->sisa = $tagihan_detail->sisa;
+
+        // dd(Cart::getContent());
+    }
+
+    public function closeModal()
+    {
+        $this->modal = false;
+    }
+
+    public function saveTransaksi($cart)
+    {
+        $grand_total = 0;
+        foreach ($cart as $row) {
+            $grand_total += $row['attributes']['dibayar'];
         }
 
+        DB::beginTransaction();
 
-        // if (count($this->cart) > 0) {
-        //     foreach ($this->cart as $ct) {
-        //         if ($ct['id'] !== $id) {
-        //             // foreach ($tagihan as $tg) {
-        //             //     $this->cart['tagihan_id'] = $tagihan->id;
-        //             //     $this->cart['']
-        //             // }
-        //             $this->cart['id_cart'] = $id;
-        //             $this->cart[] = $tagihan;
-        //         } else {
-        //             dd('udah ada');
-        //         }
-        //     }
-        //     // dd('ada');
-        // } else {
-        //     // dd('not isset');
-        //     $this->cart[] = $tagihan;
-        // }
+        try {
 
-        // dd($this->cart);
+            $kode = 'LKT-' . rand();
+            //menyimpan data ke table
+            $pembayaran = TransaksiPembayaran::create([
+                'siswa_id' => $this->selected_siswa->id,
+                'kode_pembayaran' => $kode,
+                'metode_pembayaran' => 'Loket',
+                'total' => $grand_total,
+                'status' => 'settlement',
+                'users_id' => auth()->id(),
+            ]);
 
-        // dd($this->cart);
-        // array_push($this->cart, $tagihan);
+            foreach ($cart as $row) {
+                // dd($row['id']);
+                $tagihanDetail = TagihanDetail::findOrFail($row['id']);
+
+                $totalBayar = $tagihanDetail->total_bayar + $row['attributes']['dibayar'];
+                $sisaBayar = $tagihanDetail->sisa - $row['attributes']['dibayar'];
+
+                $tagihanDetail->sisa = $sisaBayar;
+
+                if ($sisaBayar == 0) {
+                    $tagihanDetail->status = "Lunas";
+                }
+
+                if ($tagihanDetail->total_bayar != 0) {
+                    $total_bayar_detail_pembayaran = $row['attributes']['dibayar'];
+                } else {
+                    $total_bayar_detail_pembayaran = $totalBayar;
+                }
+
+                $tagihanDetail->total_bayar = $totalBayar;
+
+
+                $tagihanDetail->update();
+
+                $tes = $pembayaran->detail_pembayaran()->create([
+                    'nama_pembayaran' => $row['name'],
+                    'keterangan' => $row['attributes']['keterangan'],
+                    'harga' => $row['price'],
+                    'tagihan_details_id' => $row['id'],
+                    'total_bayar' => $total_bayar_detail_pembayaran,
+                    'sisa' => $sisaBayar
+                ]);
+            }
+            //apabila tidak terjadi error, penyimpanan diverifikasi
+            DB::commit();
+
+            Cart::session(auth()->id())->clear();
+            $this->selected_siswa = '';
+
+            $this->flash_message = "Transaksi Pembayaran Berhasil Disimpan";
+        } catch (\Exception $e) {
+            //jika ada error, maka akan dirollback sehingga tidak ada data yang tersimpan
+            DB::rollback();
+            dd($e->getMessage());
+        }
     }
 
     public function removeCart($id)

@@ -86,7 +86,7 @@
             <ul class="dropdown-menu" style="display: none;">
                 <li>
                     <a class="nav-link {{ request()->routeIs('pembayaran.create') == 'pembayaran.create' ? 'text-info' : '' }}"
-                        href="{{ route('pembayaran.create') }}">
+                        href="{{ route('pembayaran.transaksi') }}">
                         Transaksi Pembayaran
                     </a>
                 </li>
