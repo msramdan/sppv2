@@ -85,7 +85,7 @@
                 <span>Pembayaran</span></a>
             <ul class="dropdown-menu" style="display: none;">
                 <li>
-                    <a class="nav-link {{ request()->routeIs('pembayaran.create') == 'pembayaran.create' ? 'text-info' : '' }}"
+                    <a class="nav-link {{ request()->routeIs('pembayaran.transaksi') == 'pembayaran.transaksi' ? 'text-info' : '' }}"
                         href="{{ route('pembayaran.transaksi') }}">
                         Transaksi Pembayaran
                     </a>
