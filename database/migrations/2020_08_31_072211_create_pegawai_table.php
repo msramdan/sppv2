@@ -20,7 +20,7 @@ class CreatePegawaiTable extends Migration
             $table->string('no_telp')->nullable();
             $table->string('alamat')->nullable();
             $table->string('foto')->nullable();
-            $table->unsignedBigInteger('user_id');
+            $table->foreignId('user_id')->constrained('users');
             $table->timestamps();
         });
     }

@@ -18,7 +18,7 @@ class CreateJenisPembayaranTable extends Migration
             $table->string('nama_pembayaran');
             $table->string('tipe');
             $table->integer('harga');
-            $table->unsignedBigInteger('tahunajaran_id');
+            $table->foreignId('tahunajaran_id')->constrained('tahunajaran');
             $table->timestamps();
         });
     }

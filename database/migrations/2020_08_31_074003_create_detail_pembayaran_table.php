@@ -15,11 +15,13 @@ class CreateDetailPembayaranTable extends Migration
     {
         Schema::create('detail_pembayaran', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('transaksi_pembayaran_id');
-            $table->unsignedBigInteger('tagihan_details_id');
+            $table->foreignId('transaksi_pembayaran_id')->constrained('transaksi_pembayaran')->onDelete('cascade');
+            $table->foreignId('tagihan_details_id')->constrained('tagihan_details')->onDelete('cascade');
             $table->string('nama_pembayaran');
             $table->string('keterangan');
             $table->integer('harga');
+            $table->integer('total_bayar')->nullable();
+            $table->integer('sisa')->nullable();
             $table->timestamps();
         });
     }

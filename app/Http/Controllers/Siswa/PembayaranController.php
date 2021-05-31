@@ -24,19 +24,19 @@ class PembayaranController extends Controller
     public function index(Request $request)
     {
         $pembayaran = TransaksiPembayaran::where('siswa_id', auth()->user()->siswa->id)
-        ->where('status','<>', 'Draft')
-        ->latest();
-        
+            ->where('status', '<>', 'Draft')
+            ->latest();
+
         if (!empty($request->keyword)) {
             $this->keyword = $request->keyword;
-            
-            $pembayaran = $pembayaran->where('kode_pembayaran','like',"%".$this->keyword."%");
+
+            $pembayaran = $pembayaran->where('kode_pembayaran', 'like', "%" . $this->keyword . "%");
             // $pembayaran = $pembayaran->orWhere('kode_pembayaran','like',"%".$this->keyword."%");
 
             // $pembayaran = $pembayaran->orWhereHas('kategori', function ($query) {
             //     $query->where('nama_kategori', 'like', "%".$this->keyword."%");
             // });
-            
+
         }
 
         return view('user.pembayaran.index')->with('pembayaran', $pembayaran->paginate(10));
@@ -72,10 +72,10 @@ class PembayaranController extends Controller
     public function show($id)
     {
         $detail = TransaksiPembayaran::with('siswa', 'detail_pembayaran')->findOrFail($id);
-        
+
         $dueDate = new Carbon($detail->created_at);
         $dueDate->addDays(1);
-        
+
         return view('user.pembayaran.detail', compact('detail', 'dueDate'));
     }
 
@@ -113,25 +113,27 @@ class PembayaranController extends Controller
         //
     }
 
-    public function getTagihan(){
-        
+    public function getTagihan()
+    {
+
         // $data = Siswa::with('kelas', 'tagihan')->findOrFail($id)->first();
         // return $data;
         // Auth::user()->id;
         $tagihan = Tagihan::with('siswa', 'tagihan_detail', 'jenis_pembayaran')->where('siswa_id', Auth::user()->siswa->id);
-        
+
         return response()->json($tagihan->get(), 200);
     }
 
-    public function getSiswa(){
-        
+    public function getSiswa()
+    {
+
         // $siswa = Siswa::latest();
         // if (!empty($request->keyword)) {
-            // $siswa = Siswa::with('kelas', 'tagihan')->where('nama_lengkap','like',"%".$request->keyword."%")
-            //                 ->orWhere('nis', 'like', "%$request->keyword%");
-            // $siswa = $siswa->orWhereHas('kelas', function ($query) {
-            //     $query->where('nama_kelas', 'like', "%".request()->keyword."%");
-            // });
+        // $siswa = Siswa::with('kelas', 'tagihan')->where('nama_lengkap','like',"%".$request->keyword."%")
+        //                 ->orWhere('nis', 'like', "%$request->keyword%");
+        // $siswa = $siswa->orWhereHas('kelas', function ($query) {
+        //     $query->where('nama_kelas', 'like', "%".request()->keyword."%");
+        // });
         // }
         // $siswa->paginate(10);
         // return $siswa->paginate(10);
@@ -141,26 +143,26 @@ class PembayaranController extends Controller
 
     public function invoice(Request $request)
     {
-        
+
         $cartItems = Cart::content();
-        
+
         $cartTotal = Cart::total();
-        
+
         $user = Auth::user();
         $siswaId = auth()->user()->siswa->id;
-        
+
         $item_details = [];
-        foreach($cartItems as $item){
+        foreach ($cartItems as $item) {
             $item_detail = [
                 'id' => $item->id,
                 'price' => $item->price,
-                'name' => $item->name.'-'.$item->options->keterangan,
+                'name' => $item->name . '-' . $item->options->keterangan,
                 'quantity' => 1,
             ];
             array_push($item_details, $item_detail);
-        }    
+        }
 
-        $orderId = "INV-".rand();
+        $orderId = "INV-" . rand();
         $customer_details = array(
             'first_name'       => $user->siswa->nama_lengkap,
             // 'last_name'        => "tesaja",
@@ -184,26 +186,23 @@ class PembayaranController extends Controller
         try {
             // Get Snap Payment Page URL
             $paymentUrl = $this->snapMidtrans($params);
-            
+
             $this->simpanTransaksi($orderId, $request->metode, $paymentUrl->token);
 
             return redirect()->to($paymentUrl->redirect_url);
-            
-        }
-        catch (Exception $e) {
+        } catch (\Exception $e) {
             echo $e->getMessage();
         }
-        
     }
 
     public function snapMidtrans($params)
     {
         $midtrans = PengaturanPayment::all()->first();
-        
-        if($midtrans->environment === "sandbox"){
+
+        if ($midtrans->environment === "sandbox") {
             $server_key = $midtrans->server_key_sandbox;
             $prod = false;
-        }else{
+        } else {
             $server_key = $midtrans->server_key_production;
             $prod = true;
         }
@@ -223,9 +222,9 @@ class PembayaranController extends Controller
     {
         $midtrans = PengaturanPayment::all()->first();
 
-        if($midtrans->environment === "sandbox"){
+        if ($midtrans->environment === "sandbox") {
             $server_key = $midtrans->server_key_sandbox;
-        }else{
+        } else {
             $server_key = $midtrans->server_key_production;
         }
 
@@ -235,10 +234,10 @@ class PembayaranController extends Controller
         $validSignatureKey = hash("sha512", $notification->order_id . $notification->status_code . $notification->gross_amount . $server_key);
 
         if ($notification->signature_key != $validSignatureKey) {
-			return response(['message' => 'Invalid signature'], 403);
+            return response(['message' => 'Invalid signature'], 403);
         }
 
-        if($notification->transaction_status === "pending"){
+        if ($notification->transaction_status === "pending") {
             $transaksi = TransaksiPembayaran::where('kode_pembayaran', $notification->order_id)->first();
             // $transaksi->metode_pembayaran = $notification->payment_type;
             $transaksi->status = $notification->transaction_status;
@@ -246,23 +245,23 @@ class PembayaranController extends Controller
             $transaksi->update();
         }
 
-        if($notification->transaction_status === "settlement"){
+        if ($notification->transaction_status === "settlement") {
             // dd($row->id);
             $transaksiPembayaran = TransaksiPembayaran::with('detail_pembayaran')->where('kode_pembayaran', $notification->order_id)->first();
             $transaksiPembayaran->status = $notification->transaction_status;
             $transaksiPembayaran->update();
 
 
-            foreach($transaksiPembayaran->detail_pembayaran as $item){
+            foreach ($transaksiPembayaran->detail_pembayaran as $item) {
                 $tagihanDetail = TagihanDetail::findOrFail($item->tagihan_details_id);
                 // return $tagihanDetail;
                 $totalBayar = $tagihanDetail->total_bayar + $item->harga;
                 $sisaBayar = $tagihanDetail->sisa - $item->harga;
-                
+
                 $tagihanDetail->total_bayar = $totalBayar;
                 $tagihanDetail->sisa = $sisaBayar;
 
-                if($sisaBayar == 0){
+                if ($sisaBayar == 0) {
                     $tagihanDetail->status = "Lunas";
                 }
 
@@ -270,32 +269,30 @@ class PembayaranController extends Controller
             }
         }
 
-        if($notification->transaction_status === "cancel"){
+        if ($notification->transaction_status === "cancel") {
             $transaksi = TransaksiPembayaran::where('kode_pembayaran', $notification->order_id)->first();
             $transaksi->status = $notification->transaction_status;
             $transaksi->update();
         }
 
-        if($notification->transaction_status === "expire"){
+        if ($notification->transaction_status === "expire") {
             $transaksi = TransaksiPembayaran::where('kode_pembayaran', $notification->order_id)->first();
             $transaksi->status = $notification->transaction_status;
             $transaksi->update();
         }
 
         return response()->json(['message' => 'sukses']);
-
-
     }
 
     public function completed(Request $request)
     {
-        $transaksi = TransaksiPembayaran::where('kode_pembayaran', $request->order_id)->first(); 
-            
+        $transaksi = TransaksiPembayaran::where('kode_pembayaran', $request->order_id)->first();
+
         return view('user.pembayaran.completed', compact('transaksi'));
     }
 
     public function setMetodePembayaran(Request $request)
-    {   
+    {
         session(['metodePembayaran' => $request->metode]);
         return response()->json(['message' => 'sukses']);
     }
@@ -307,23 +304,23 @@ class PembayaranController extends Controller
         $totalQty = Cart::count();
 
         // $enable_payments = array('gopay', 'bca_va', 'permata_va', 'bni_va', 'echannel', 'other_va');
-        if($metode === "gopay"){
+        if ($metode === "gopay") {
             $metodePembayaran = "GOPAY";
-        }elseif($metode === "bca_va"){
+        } elseif ($metode === "bca_va") {
             $metodePembayaran = "BCA VA";
-        }elseif($metode === "permata_va"){
+        } elseif ($metode === "permata_va") {
             $metodePembayaran = "PERMATA VA";
-        }elseif($metode === "bni_va"){
+        } elseif ($metode === "bni_va") {
             $metodePembayaran = "BNI VA";
-        }elseif($metode === "echannel"){
+        } elseif ($metode === "echannel") {
             $metodePembayaran = "MANDIRI VA";
-        }elseif($metode === "other_va"){
+        } elseif ($metode === "other_va") {
             $metodePembayaran = "Bank Lainnya";
         }
-        
+
         DB::beginTransaction();
-        try {         
-              
+        try {
+
             //menyimpan data ke table
             $pembayaran = TransaksiPembayaran::create([
                 'siswa_id' => auth()->user()->siswa->id,
@@ -335,16 +332,15 @@ class PembayaranController extends Controller
                 'users_id' => auth()->user()->id,
             ]);
 
-                
-            // //looping cart untuk disimpan ke table 
-            foreach ($cartItems as $row) {                
+
+            // //looping cart untuk disimpan ke table
+            foreach ($cartItems as $row) {
                 $tes = $pembayaran->detail_pembayaran()->create([
                     'tagihan_details_id' => $row->id,
                     'nama_pembayaran' => $row->name,
                     'keterangan' => $row->options->keterangan,
                     'harga' => $row->price,
                 ]);
-
             }
             //apabila tidak terjadi error, penyimpanan diverifikasi
             DB::commit();
@@ -358,7 +354,7 @@ class PembayaranController extends Controller
                 // 'message' => $penjualan->invoice,
             ], 200);
         } catch (\Exception $e) {
-            //jika ada error, maka akan dirollback sehingga tidak ada data yang tersimpan 
+            //jika ada error, maka akan dirollback sehingga tidak ada data yang tersimpan
             DB::rollback();
             //pesan gagal akan di-return
             return response()->json([

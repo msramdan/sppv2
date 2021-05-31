@@ -4,7 +4,6 @@ namespace App\Models;
 
 use App\User;
 use App\Models\Kelas;
-use App\Models\Siswa;
 use App\Models\Tagihan;
 use Illuminate\Database\Eloquent\Model;
 

@@ -38,7 +38,7 @@
                                             <div class="text-danger small mt-1">{{ $message }}</div>
                                         @enderror
                                     </div>
-                                    
+
                                 </div>
                                 <div class="col-md-4">
                                     <div class="form-group">
@@ -64,9 +64,9 @@
                                             <option value="{{ $item->id  }}"
                                                     @if ($item->id == request()->kelas_id)
                                                         selected
-                                                    @endif    
+                                                    @endif
                                                 >
-                                                
+
                                                 {{ $item->nama_kelas }}
                                             </option>
                                             @endforeach
@@ -118,14 +118,14 @@
                     </div>
                     <!-- /.card-header -->
                     <div class="card-body">
-                        
+
                         <form action="{{ route('siswa.index') }}" method="GET">
                             {{-- @csrf --}}
                             <div class="input-group input-group mb-3 float-right" style="width: 300px;">
                                 <input type="text" name="keyword" class="form-control float-right"
                                 placeholder="Search" value="{{request()->query('keyword')}}">
-    
-                                
+
+
                                 <div class="input-group-append">
                                     <button type="submit" class="btn btn-light"><i class="fas fa-search"></i></button>
                                 </div>
@@ -181,10 +181,10 @@
                                                     <img width="64px" height="64px" class="my-2 rounded-circle shadow"
                                                         src="{{ asset('/img/siswa').'/'. $row->foto }}"
                                                         alt="">
-                                                </a>    
+                                                </a>
                                             </td>
                                             <td>
-                                                
+
                                                 <a href="{{ route('siswa.show', $row->id )}}" class="text-dark">
                                                     {{ $row->nis }} <br>
                                                     {{ $row->nama_lengkap }}
@@ -202,11 +202,11 @@
                                             <td colspan="4" class="text-center">Data Tidak Ada</td>
                                         </tr>
                                     @endforelse
-    
+
                                 </tbody>
                             </table>
                             {{ $siswa->appends([
-                                'keyword' => request()->query('keyword'), 
+                                'keyword' => request()->query('keyword'),
                                 'kelas_id' => request()->query('kelas_id'),
                                 'jk' => request()->query('jk'),
                                 'status' => request()->query('status'),
@@ -311,21 +311,18 @@
 @if(session()->has('success'))
     <script>
         $(document).ready(function () {
-            // toastr["success"]('{{ session()->get('success') }}')
             iziToast.success({
                 title: '',
                 message: '{{ session()->get('success') }}',
                 position: 'bottomCenter'
             });
         });
-
     </script>
 @endif
 
 @error('import_siswa')
     <script>
         $(document).ready(function () {
-            // toastr["info"]('{{ session()->get('error') }}')
             iziToast.error({
                 title: '',
                 message: 'Import Data Siswa Gagal!',
@@ -338,7 +335,6 @@
 @if(session()->has('error'))
     <script>
         $(document).ready(function () {
-            // toastr["info"]('{{ session()->get('error') }}')
             iziToast.info({
                 title: '',
                 message: '{{ session()->get('error') }}',

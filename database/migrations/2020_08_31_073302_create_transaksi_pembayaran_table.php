@@ -16,13 +16,13 @@ class CreateTransaksiPembayaranTable extends Migration
         Schema::create('transaksi_pembayaran', function (Blueprint $table) {
             $table->id();
             $table->string('kode_pembayaran');
-            $table->unsignedBigInteger('siswa_id');
+            $table->foreignId('siswa_id')->constrained('siswa');
             $table->string('metode_pembayaran');
             $table->integer('total');
             $table->string('status');
             $table->json('pembayaran_detail')->nullable();
             $table->string('token')->nullable();
-            $table->unsignedBigInteger('users_id')->nullable();
+            $table->foreignId('users_id')->constrained('users');
             $table->timestamps();
         });
     }
