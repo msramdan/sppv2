@@ -6,7 +6,6 @@ use App\Models\Siswa;
 use App\Models\Tagihan;
 use Livewire\Component;
 use App\JenisPembayaran;
-use Illuminate\Support\Str;
 use App\Models\TagihanDetail;
 use Illuminate\Support\Facades\DB;
 use App\Models\TransaksiPembayaran;
@@ -66,11 +65,11 @@ class TransaksiPembayaranLivewire extends Component
         if ($this->dibayar == '') {
             $this->error_message = 'Dibayar tidak boleh kosong!';
         } else {
-            // $sisa = $this->sisa - $this->dibayar;
-            // if ($sisa <= 0) {
-            //     $sisa = 0;
-            //     $this->dibayar = $this->nominal;
-            // }
+            $sisa = $this->sisa - $this->dibayar;
+            if ($sisa <= 0) {
+                $sisa = 0;
+                $this->dibayar = $this->nominal;
+            }
 
             Cart::session(auth()->id())->add([
                 'id' => $this->tagihan_id,
@@ -90,11 +89,6 @@ class TransaksiPembayaranLivewire extends Component
 
     public function showModal($id)
     {
-        // $this->tagihan_id = '';
-        // $this->nama_pembayaran = '';
-        // $this->nominal = '';
-        // $this->keterangan = '';
-        // $this->sisa = '';
         $this->dibayar = '';
         $this->error_message = '';
         $this->modal = true;
@@ -102,8 +96,6 @@ class TransaksiPembayaranLivewire extends Component
         $tagihan_detail = TagihanDetail::with('tagihan')->findOrFail($id);
 
         $jenis_pembayaran = JenisPembayaran::findOrFail($tagihan_detail->tagihan->jenis_pembayaran_id);
-
-        // $this->sisa = $tagihan_detail->sisa;
 
         $this->tagihan_id = $id;
         $this->nama_pembayaran = $jenis_pembayaran->nama_pembayaran;

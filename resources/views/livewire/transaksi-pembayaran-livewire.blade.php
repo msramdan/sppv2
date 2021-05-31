@@ -38,7 +38,7 @@
             @endif
         </div>
     </div>
-    {{-- @dump(\Cart::getContent()) --}}
+    {{-- @dump(\Cart::session(Auth()->id())->getContent()) --}}
 
     {{-- info siswa --}}
     @if ($selected_siswa)
@@ -54,7 +54,7 @@
                     <div class="col-md-8">
                         <p class="mb-0 mt-0 font-weight-bold">Nama : {{ $selected_siswa->nama_lengkap }}</p>
                         <p class="mb-0">NIS: {{ $selected_siswa->nis }}</p>
-                        <p class="mb-0">Kelas: {{ $selected_siswa->nis }}</p>
+                        <p class="mb-0">Kelas: {{ $selected_siswa->kelas->nama_kelas }}</p>
                         <p class="mb-0">Status: {{ $selected_siswa->status }}</p>
                     </div>
                 </div>
@@ -104,7 +104,7 @@
                                                             Lunas
                                                         </button>
                                                     @else
-                                                        <button class="btn btn-info btn-sm btn-block" @forelse (\Cart::getContent() as $cart)  @if ($cart->id
+                                                        <button class="btn btn-info btn-sm btn-block" @forelse (\Cart::session(Auth()->id())->getContent() as $cart)  @if ($cart->id
                                                             !=$td->id)
                                                             wire:click="showModal({{ $td->id }})"
                                                         @else
@@ -142,182 +142,181 @@
                                                 Lunas
                                             </button>
                                         @else
-                                            <button class="btn btn-info btn-sm btn-block" @forelse (\Cart::getContent() as $cart)
-                                                @if ($cart->id !=$td->id)
+                                            <button class="btn btn-info btn-sm btn-block" @forelse (\Cart::session(Auth()->id())->getContent() as $cart)  @if ($cart->id !=$td->id)
                                                 wire:click="showModal({{ $td->id }})"
                                             @else
                                                 disabled @endif
-                                            @empty
-                                                wire:click="showModal({{ $td->id }})"
-                                        @endforelse>
-                                        <i class="fas fa-money-bill-wave"></i>
-                                        Bayar
-                                        </button>
-                        @endif
-                        {{-- $td->status == 'Lunas' --}}
+                                                @empty
+                                                    wire:click="showModal({{ $td->id }})"
+                                            @endforelse>
+                                            <i class="fas fa-money-bill-wave"></i>
+                                            Bayar
+                                            </button>
+                            @endif
+                            {{-- $td->status == 'Lunas' --}}
+                        </div>
                     </div>
-                </div>
-        @endif
-        {{-- $tgh->jenis_pembayaran->tipe === 'bulanan' --}}
+            @endif
+            {{-- $tgh->jenis_pembayaran->tipe === 'bulanan' --}}
+            @endforeach
+            {{-- $tgh->tagihan_detail as $td --}}
+        </div>
+        </div>
+        </div>
         @endforeach
-        {{-- $tgh->tagihan_detail as $td --}}
-    </div>
-    </div>
-    </div>
-    @endforeach
-    {{-- $tagihan as $tgh --}}
-    </div>
-    </div>
+        {{-- $tagihan as $tgh --}}
+        </div>
+        </div>
 
 
-    <div class="col-md-6">
-        {{-- @{{tagihan_id}} --}}
-        <div class="card card-info">
+        <div class="col-md-6">
+            {{-- @{{tagihan_id}} --}}
+            <div class="card card-info">
 
-            <div class="card-body">
+                <div class="card-body">
 
-                <h6 class="card-title">Pembayaran Detail</h6>
-                {{-- <div v-if="submitCart" class="spinner-border text-danger spinner-border-sm" role="status">
+                    <h6 class="card-title">Pembayaran Detail</h6>
+                    {{-- <div v-if="submitCart" class="spinner-border text-danger spinner-border-sm" role="status">
                                 <span class="sr-only">Loading...</span>
                             </div> --}}
 
-                <table class="table table-sm table-hover table-striped m-0">
-                    <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>Pembayaran</th>
-                            <th>Nominal</th>
-                            <th>Dibayar</th>
-                            <th>Sisa</th>
-                            <th>Aksi</th>
-                        </tr>
-                    </thead>
+                    <table class="table table-sm table-hover table-striped m-0">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Pembayaran</th>
+                                <th>Nominal</th>
+                                <th>Dibayar</th>
+                                <th>Sisa</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
 
-                    <tbody>
-                        @php
-                            $sub_dibayar = 0;
-                        @endphp
-                        @forelse (\Cart::getContent() as $cart)
+                        <tbody>
                             @php
-                                $sub_dibayar += $cart->attributes->dibayar;
+                                $sub_dibayar = 0;
                             @endphp
-                            <tr>
-                                <td>{{ $loop->iteration }}</td>
-                                <td>
-                                    <p class="mb-0">{{ $cart->name }}</p>
-                                    <p>{{ $cart->attributes->keterangan }}</p>
-                                </td>
-                                <td>
-                                    <p>Rp. {{ number_format($cart->price) }}</p>
-                                </td>
-                                <td>
-                                    <p>Rp. {{ number_format($cart->attributes->dibayar) }}</p>
-                                </td>
-                                <td>
-                                    <p>Rp. {{ number_format($cart->attributes->sisa) }}</p>
-                                </td>
-                                <td>
-                                    <button class="btn btn-transparent" wire:click="removeCart({{ $cart->id }})">
-                                        <i class="fas fa-times-circle text-danger"></i>
-                                    </button>
-                                </td>
-                            </tr>
-                        @empty
-                            <tr>
-                                <td colspan="6" class="text-center">
-                                    <img alt="image" style="opacity: 0.3" height="90px" width="90px"
-                                        src="../img/undraw_empty_cart_co35.png">
-                                </td>
-                            </tr>
-                        @endforelse
+                            @forelse (\Cart::session(Auth()->id())->getContent() as $cart)
+                                @php
+                                    $sub_dibayar += $cart->attributes->dibayar;
+                                @endphp
+                                <tr>
+                                    <td>{{ $loop->iteration }}</td>
+                                    <td>
+                                        <p class="mb-0">{{ $cart->name }}</p>
+                                        <p>{{ $cart->attributes->keterangan }}</p>
+                                    </td>
+                                    <td>
+                                        <p>Rp. {{ number_format($cart->price) }}</p>
+                                    </td>
+                                    <td>
+                                        <p>Rp. {{ number_format($cart->attributes->dibayar) }}</p>
+                                    </td>
+                                    <td>
+                                        <p>Rp. {{ number_format($cart->attributes->sisa) }}</p>
+                                    </td>
+                                    <td>
+                                        <button class="btn btn-transparent" wire:click="removeCart({{ $cart->id }})">
+                                            <i class="fas fa-times-circle text-danger"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="6" class="text-center">
+                                        <img alt="image" style="opacity: 0.3" height="90px" width="90px"
+                                            src="../img/undraw_empty_cart_co35.png">
+                                    </td>
+                                </tr>
+                            @endforelse
 
-                    </tbody>
-                </table>
+                        </tbody>
+                    </table>
 
-                {{-- \Cart::getContent() as $cart --}}
-                <div class="py-4 ">
-                    <h6>Total Bayar</h6>
-                    <h4>Rp. {{ number_format($sub_dibayar) }}</h4>
+                    {{-- \Cart::session(Auth()->id())->getContent() as $cart --}}
+                    <div class="py-4 ">
+                        <h6>Total Bayar</h6>
+                        <h4>Rp. {{ number_format($sub_dibayar) }}</h4>
+                    </div>
+
+                    <button class="btn btn- {{ $sub_dibayar == 0 ? 'btn-dark' : 'btn-primary' }} btn-block"
+                        wire:click="saveTransaksi({{ \Cart::session(Auth()->id())->getContent() }})"
+                        {{ $sub_dibayar == 0 ? 'disabled' : '' }}>Lanjutkan
+                        Pembayaran</button>
+
                 </div>
-
-                <button class="btn btn- {{ $sub_dibayar == 0 ? 'btn-dark' : 'btn-primary' }} btn-block"
-                    wire:click="saveTransaksi({{ \Cart::getContent() }})"
-                    {{ $sub_dibayar == 0 ? 'disabled' : '' }}>Lanjutkan
-                    Pembayaran</button>
-
             </div>
         </div>
-    </div>
-    <!-- /.col-md -->
+        <!-- /.col-md -->
 
-    </div>
+        </div>
 
-@else
-    <div class="col-md-6 mx-auto">
-        <img class="w-75" style="opacity: 0.3" src="{{ asset('/img/undraw_file_searching_duff.png') }}" alt="">
-    </div>
-    @endif
-    {{-- ($selected_siswa --}}
+    @else
+        <div class="col-md-6 mx-auto">
+            <img class="w-75" style="opacity: 0.3" src="{{ asset('/img/undraw_file_searching_duff.png') }}" alt="">
+        </div>
+        @endif
+        {{-- ($selected_siswa --}}
 
 
-    @if ($modal)
-        <div class="modal-mask">
-            <div class="modal-wrapper">
-                <div class="modal-dialog shadow" role="document">
-                    <div class="modal-content">
-                        <div class="modal-body mb-0">
-                            <div class="form-group">
-                                <label for="nama-pembayaran">Nama Pembayaran</label>
-                                <input id="nama-pembayaran" type="text" class="form-control" wire:model="nama_pembayaran"
-                                    disabled>
-                            </div>
+        @if ($modal)
+            <div class="modal-mask">
+                <div class="modal-wrapper">
+                    <div class="modal-dialog shadow" role="document">
+                        <div class="modal-content">
+                            <div class="modal-body mb-0">
+                                <div class="form-group">
+                                    <label for="nama-pembayaran">Nama Pembayaran</label>
+                                    <input id="nama-pembayaran" type="text" class="form-control" wire:model="nama_pembayaran"
+                                        disabled>
+                                </div>
 
-                            <div class="form-group">
-                                <label for="keterangan">Keterangan</label>
-                                <input id="keterangan" type="text" class="form-control" wire:model="keterangan" disabled>
-                            </div>
+                                <div class="form-group">
+                                    <label for="keterangan">Keterangan</label>
+                                    <input id="keterangan" type="text" class="form-control" wire:model="keterangan" disabled>
+                                </div>
 
-                            <div class="form-group">
-                                <label for="nominal">Nominal</label>
-                                <input id="nominal" type="text" class="form-control" wire:model="nominal_string" disabled>
-                            </div>
+                                <div class="form-group">
+                                    <label for="nominal">Nominal</label>
+                                    <input id="nominal" type="text" class="form-control" wire:model="nominal_string" disabled>
+                                </div>
 
-                            <div class="form-group">
-                                <label for="dibayar">Dibayar</label>
-                                <input id="dibayar" type="number"
-                                    class="form-control{{ $error_message ? ' is-invalid' : '' }}" wire:model="dibayar"
-                                    autofocus>
-                                <small class="text-danger">
-                                    {{ $error_message ? $error_message : '' }}
-                                </small>
-                            </div>
+                                <div class="form-group">
+                                    <label for="dibayar">Dibayar</label>
+                                    <input id="dibayar" type="number"
+                                        class="form-control{{ $error_message ? ' is-invalid' : '' }}" wire:model="dibayar"
+                                        autofocus>
+                                    <small class="text-danger">
+                                        {{ $error_message ? $error_message : '' }}
+                                    </small>
+                                </div>
 
-                            <button type="button" class="btn btn-danger mt-2 btn-block"
-                                wire:click="closeModal()">Tutup</button>
-                            <button type="button" class="btn btn-primary btn-block" wire:click="addToCart()">
-                                {{-- <span v-if="simpanBtn" class="spinner-border spinner-border-sm" role="status"
+                                <button type="button" class="btn btn-danger mt-2 btn-block"
+                                    wire:click="closeModal()">Tutup</button>
+                                <button type="button" class="btn btn-primary btn-block" wire:click="addToCart()">
+                                    {{-- <span v-if="simpanBtn" class="spinner-border spinner-border-sm" role="status"
                                     aria-hidden="true"></span>
                                 Proses... --}}
-                                Tambahkan ke keranjang
-                            </button>
+                                    Tambahkan ke keranjang
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-    @endif
+        @endif
 
 
-    @if ($flash_message)
-        <script>
-            $(document).ready(function() {
-                iziToast.success({
-                    title: '',
-                    message: 'Transaksi Pembayaran Berhasil Disimpan',
-                    position: 'bottomCenter'
+        @if ($flash_message)
+            <script>
+                $(document).ready(function() {
+                    iziToast.success({
+                        title: '',
+                        message: 'Transaksi Pembayaran Berhasil Disimpan',
+                        position: 'bottomCenter'
+                    });
                 });
-            });
 
-        </script>
-    @endif
-    </div>
+            </script>
+        @endif
+        </div>
