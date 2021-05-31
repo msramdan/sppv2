@@ -24,7 +24,7 @@
                 <div class="col-12">
                     <div class="card">
                         <div class="card-header iseng-sticky bg-white">
-                            <a href="{{ route('tahunajaran.index') }}" class="btn">
+                            <a href="{{ route('pembayaran.index') }}" class="btn">
                                 <i class="fas fa-arrow-left  text-dark  "></i>
                             </a>
                             <h4 class="ml-3">Form Transaksi Pembayaran</h4>
