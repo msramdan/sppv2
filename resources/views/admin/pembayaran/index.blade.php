@@ -22,9 +22,14 @@
                             <div class="card-header-action">
                                 <a href="{{ route('pembayaran.transaksi') }}" class="btn btn-primary btn-icon"
                                     data-toggle="tooltip" data-placement="top" title="" data-original-title="Tambah Data">
-                                    <i class="fas fa-plus-circle px-2    "></i>
+                                    <i class="fas fa-plus-circle px-2"></i>
                                 </a>
 
+                                <a href="#" class="btn btn-secondary btn-icon ml-2" onclick="handleImport()"
+                                    title="Import Excel" data-toggle="tooltip" data-placement="top"
+                                    data-original-title="Import Data Pembayaran">
+                                    <i class="fas fa-file-import px-2"></i>
+                                </a>
                             </div>
                         </div>
                         <!-- /.card-header -->
@@ -42,7 +47,7 @@
                                     </div>
                                     <div class="input-group-append">
                                         <a href="{{ route('pembayaran.index') }}" title="Refresh" class="btn btn-light"><i
-                                                class="fas fa-circle-notch mt-2    "></i></a>
+                                                class="fas fa-circle-notch mt-2"></i></a>
                                     </div>
                                 </div>
                             </form>
@@ -50,7 +55,6 @@
                                 <table class="table table-head-fixed text-nowrap table-bordered">
                                     <thead>
                                         <tr class="text-center">
-                                            {{-- <th>#</th> --}}
                                             <th>No</th>
                                             <th>Tgl.Pembayaran</th>
                                             <th>Kode</th>
@@ -58,43 +62,11 @@
                                             <th>Metode <br> Pembayaran</th>
                                             <th>Total</th>
                                             <th>Status</th>
-                                            {{-- <th>Total Produk</th> --}}
-                                            {{-- <th>#</th> --}}
                                         </tr>
                                     </thead>
                                     <tbody>
                                         @forelse($pembayaran as $row)
                                             <tr>
-                                                {{-- <td style="width: 20px">
-                                                <div class="btn-group">
-                                                    <button type="button" class="btn" data-toggle="dropdown">
-                                                        <i class="fas fa-ellipsis-v    "></i>
-                                                    </button>
-                                                    <ul class="dropdown-menu">
-                                                        <li>
-                                                            <a class="dropdown-item"
-                                                                href="{{ route('pembayaran.edit', $row->id) }}">
-                                                                <i class="fas fa-edit    "></i>
-                                                                Edit
-                                                            </a>
-                                                        </li>
-                                                        <li>
-                                                            <a class="dropdown-item"
-                                                                href="{{ route('pembayaran.show', $row->id) }}">
-                                                                <i class="fas fa-file-invoice    "></i>
-                                                                Detail Pembayaran
-                                                            </a>
-                                                        </li>
-                                                        <li>
-                                                            <a class="dropdown-item" href="#"
-                                                                onclick="handleDelete ({{ $row->id }})">
-                                                                <i class="fas fa-trash    "></i>
-                                                                Delete
-                                                            </a>
-                                                        </li>
-                                                    </ul>
-                                                </div>
-                                            </td> --}}
                                                 <td style="width: 50px">{{ $loop->iteration }}</td>
                                                 <td>
                                                     {{ $row->created_at }}
@@ -112,36 +84,35 @@
                                                 <td>{{ $row->metode_pembayaran }}</td>
                                                 <td class="text-right">Rp.{{ number_format($row->total) }}</td>
                                                 <td>
-                                                    @if ($row->status === 'settlement' || $row->status === 'Success')
+                                                    @if ($row->status == 'settlement' || $row->status == 'Success')
                                                         <span class="text-success">
-                                                            <i class="fas fa-check-circle    "></i>
+                                                            <i class="fas fa-check-circle "></i>
                                                             Settlement
                                                         </span>
                                                     @endif
-                                                    @if ($row->status === 'expire')
+                                                    @if ($row->status == 'expire')
                                                         <span class="text-danger">
-                                                            <i class="fas fa-times-circle    "></i>
+                                                            <i class="fas fa-times-circle "></i>
                                                             Expire
                                                         </span>
                                                     @endif
-                                                    @if ($row->status === 'pending')
+                                                    @if ($row->status == 'pending')
                                                         <span class="text-warning">
-                                                            <i class="fas fa-info-circle    "></i>
+                                                            <i class="fas fa-info-circle "></i>
                                                             Pending
                                                         </span>
                                                     @endif
                                                     @if ($row->status === 'cancel')
                                                         <span class="text-secondary">
-                                                            <i class="fas fa-info-circle    "></i>
+                                                            <i class="fas fa-info-circle "></i>
                                                             Cancel
                                                         </span>
                                                     @endif
                                                 </td>
-                                                {{-- <td>{{$row->produk->count() }}</td> --}}
                                             </tr>
                                         @empty
                                             <tr>
-                                                <td colspan="4" class="text-center">Data Tidak Ada</td>
+                                                <td colspan="7" class="text-center">Data Tidak Ada</td>
                                             </tr>
                                         @endforelse
 
@@ -162,6 +133,47 @@
         </section>
         <!-- /.content -->
     </section>
+
+
+    <!-- Modal Import File-->
+    <div class="modal fade" id="importModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteModalLabel">Import Data Pembayaran</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form action="{{ route('pembayaran.import') }}" method="POST" enctype="multipart/form-data">
+                        @csrf
+                        <div class="form-group">
+                            <label for="import_pembayaran">Import File</label>
+                            <input type="file" class="form-control-file" name="import_pembayaran" id="import_pembayaran"
+                                placeholder="" aria-describedby="fileHelpId" required>
+
+                            @error('import_pembayaran')
+                                <div class="text-danger small mt-1">{{ $message }}</div>
+                            @enderror
+
+                            <small id="fileHelpId" class="form-text text-muted">Tipe file : xls, xlsx</small>
+
+                            <small id="fileHelpId" class="form-text text-muted">Pastikan file upload sesuai format. <br> <a
+                                    href="{{ url('template/contoh_format_import_siswa.xlsx') }}">Download
+                                    contoh format file xlsx <i class="fas fa-download ml-1   "></i></a></small>
+                        </div>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-light" data-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                </div>
+                </form>
+            </div>
+        </div>
+    </div>
 
     <!-- Modal Delete-->
     <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
@@ -199,12 +211,15 @@
         $('#deleteModal').modal('show')
     }
 
+    function handleImport(e) {
+        $('#importModal').modal('show')
+    }
+
 </script>
 
 @if (session()->has('success'))
     <script>
         $(document).ready(function() {
-            // toastr["success"]('{{ session()->get('success') }}')
             iziToast.success({
                 title: '',
                 message: '{{ session()->get('success') }}',
@@ -218,10 +233,9 @@
 @if (session()->has('error'))
     <script>
         $(document).ready(function() {
-            // toastr["info"]('{{ session()->get('error') }}')
-            iziToast.info({
+            iziToast.error({
                 title: '',
-                message: '{{ session()->get('success') }}',
+                message: '{{ session()->get('error') }}',
                 position: 'bottomCenter'
             });
         });

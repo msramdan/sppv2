@@ -6,10 +6,12 @@ use App\Models\Siswa;
 use App\Models\Tagihan;
 use App\JenisPembayaran;
 use Illuminate\Http\Request;
+use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Carbon;
 use App\Models\PengaturanSekolah;
 use App\Models\TransaksiPembayaran;
 use App\Http\Controllers\Controller;
+use App\Imports\TransaksiPembayaranImport;
 use Illuminate\Support\Facades\Auth;
 
 class TransaksiPembayaranController extends Controller
@@ -65,10 +67,6 @@ class TransaksiPembayaranController extends Controller
             $this->keyword = $request->siswa_id;
 
             $tagihanSiswa = Siswa::with('tagihan')->findOrFail($this->keyword);
-            // dd($tagihanSiswa);
-            // $pembayaran = $pembayaran->orWhereHas('kategori', function ($query) {
-            //     $query->where('nama_kategori', 'like', "%".$this->keyword."%");
-            // });
 
             $siswa = Siswa::all();
             return view('admin.pembayaran.create', compact('siswa', 'tagihanSiswa', 'bulan'));
@@ -86,11 +84,9 @@ class TransaksiPembayaranController extends Controller
     public function store(Request $request)
     {
         $jenisPembayaran = JenisPembayaran::findOrFail($request->jenis_pembayaran_id);
-        // return $request->all();
-        // return auth()->user()->id;
-        // dd($jpembayaranddd);
+
         $dt = Carbon::now();
-        // echo $dt->toDateString();
+
         $pembayaran = TransaksiPembayaran::create([
             'siswa_id' => $request->id,
             'tanggal_pembayaran' => $dt->toDateString(),
@@ -100,7 +96,6 @@ class TransaksiPembayaranController extends Controller
             'users_id' => Auth::user()->id,
         ]);
 
-        // return redirect(route('pembayaran.index'));
         return redirect(route('pembayaran.index'));
     }
 
@@ -113,45 +108,8 @@ class TransaksiPembayaranController extends Controller
     public function show($id)
     {
         $detail = TransaksiPembayaran::with('siswa', 'detail_pembayaran', 'user')->findOrFail($id);
-        // return $detail;
 
-        // echo json_encode($detail);
-        // die;
         return view('admin.pembayaran.detail', compact('detail'));
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id)
-    {
-        //
     }
 
     public function getSiswa(Request $request)
@@ -170,10 +128,24 @@ class TransaksiPembayaranController extends Controller
 
     public function cetak($id)
     {
-
         $detail = TransaksiPembayaran::with('siswa', 'detail_pembayaran')->findOrFail($id);
         $sekolahInfo = PengaturanSekolah::all()->first();
 
         return view('admin.pembayaran.cetak', compact('detail', 'sekolahInfo'));
+    }
+
+    public function importExcel(Request $request)
+    {
+        try {
+            Excel::import(new TransaksiPembayaranImport, $request->file('import_pembayaran'));
+
+            session()->flash('success', "Data Pembayaran berhasil di import");
+
+            return redirect(route('pembayaran.index'));
+        } catch (\Exception $e) {
+            session()->flash('error', "Format excel tidak sesuai");
+
+            return redirect(route('pembayaran.index'));
+        }
     }
 }

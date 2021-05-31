@@ -18,7 +18,7 @@ class SiswaTableSeeder extends Seeder
             'nama_kelas' => 'Kelas 10',
         ]);
 
-        $siswa1 = factory(Siswa::class, 30)->make()->each(function ($siswa) {
+        $siswa1 = factory(Siswa::class, 2)->make()->each(function ($siswa) {
             $uniq = uniqid();
             $user = User::create([
                 'name' => $siswa->nama_lengkap,
@@ -37,7 +37,7 @@ class SiswaTableSeeder extends Seeder
             'nama_kelas' => 'Kelas 11',
         ]);
 
-        $siswa2 = factory(Siswa::class, 20)->make()->each(function ($siswa) {
+        $siswa2 = factory(Siswa::class, 30)->make()->each(function ($siswa) {
             $uniq = uniqid();
             $user = User::create([
                 'name' => $siswa->nama_lengkap,

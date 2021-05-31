@@ -89,6 +89,8 @@ Route::group(['middleware' => 'auth'], function () {
     Route::group(['middleware' => ['permission:manajemen transaksi pembayaran']], function () {
         Route::view('pembayaran/transaksi', 'admin.pembayaran.transaksi')->name('pembayaran.transaksi');
 
+        Route::post('pembayaran/import', 'Admin\TransaksiPembayaranController@importExcel')->name('pembayaran.import');
+
 
         Route::get('/getSiswa', 'Admin\TransaksiPembayaranController@getSiswa');
         Route::get('/getTagihan/{id}', 'Admin\TransaksiPembayaranController@getTagihan');
