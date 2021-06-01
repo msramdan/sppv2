@@ -21,10 +21,10 @@
                         <div class="card-header iseng-sticky bg-white">
                             <h4>Jenis Pembayaran</h4>
                             <div class="card-header-action">
-                                {{-- <a href="{{ route('jenispembayaran.create') }}" class="btn btn-primary btn-icon"
+                                <a href="{{ route('jenispembayaran.create') }}" class="btn btn-primary btn-icon"
                                     data-toggle="tooltip" data-placement="top" title="" data-original-title="Tambah Data">
                                     <i class="fas fa-plus-circle px-2"></i>
-                                </a> --}}
+                                </a>
 
                             </div>
                         </div>
@@ -52,6 +52,7 @@
                                 <table class="table table-head-fixed text-nowrap table-bordered">
                                     <thead>
                                         <tr class="text-center">
+                                            <th>#</th>
                                             <th>No</th>
                                             <th>Nama / Jenis Pembayaran </th>
                                             <th>Tahun Pelajaran</th>
@@ -62,6 +63,29 @@
                                     <tbody>
                                         @forelse($jenis_pembayaran as $row)
                                             <tr>
+                                                <td style="width: 20px">
+                                                    <div class="btn-group">
+                                                        <button type="button" class="btn" data-toggle="dropdown">
+                                                            <i class="fas fa-ellipsis-v    "></i>
+                                                        </button>
+                                                        <ul class="dropdown-menu">
+                                                            <li>
+                                                                <a class="dropdown-item"
+                                                                    href="{{ route('jenispembayaran.edit', $row->id) }}">
+                                                                    <i class="fas fa-edit"></i>
+                                                                    Edit
+                                                                </a>
+                                                            </li>
+                                                            <li>
+                                                                <a class="dropdown-item" href="#"
+                                                                    onclick="handleDelete ({{ $row->id }})">
+                                                                    <i class="fas fa-trash    "></i>
+                                                                    Delete
+                                                                </a>
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                                </td>
                                                 <td style="width: 50px">{{ $loop->iteration }}</td>
                                                 <td>{{ $row->nama_pembayaran }}
                                                     {{ '(' . $row->tagihan->count() . ')' }}

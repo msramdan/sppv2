@@ -98,7 +98,6 @@ class TransaksiPembayaranController extends Controller
 
         return redirect(route('pembayaran.index'));
     }
-
     /**
      * Display the specified resource.
      *
@@ -108,8 +107,42 @@ class TransaksiPembayaranController extends Controller
     public function show($id)
     {
         $detail = TransaksiPembayaran::with('siswa', 'detail_pembayaran', 'user')->findOrFail($id);
-
+        // return $detail;
         return view('admin.pembayaran.detail', compact('detail'));
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function edit($id)
+    {
+        //
+    }
+
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function update(Request $request, $id)
+    {
+        //
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function destroy($id)
+    {
+        //
     }
 
     public function getSiswa(Request $request)

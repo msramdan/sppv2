@@ -86,7 +86,7 @@ Route::group(['middleware' => 'auth'], function () {
 
     //jenispembayaran
     Route::group(['middleware' => ['permission:manajemen jenis pembayaran']], function () {
-        Route::resource('/jenispembayaran', 'JenisPembayaranController')->only('index');
+        Route::resource('/jenispembayaran', 'JenisPembayaranController');
     });
 
     //transaksi pembayaran
@@ -99,7 +99,7 @@ Route::group(['middleware' => 'auth'], function () {
 
         Route::get('/getTagihan/{id}', 'Admin\TransaksiPembayaranController@getTagihan');
 
-        Route::resource('/pembayaran', 'Admin\TransaksiPembayaranController')->only('index', 'show');
+        Route::resource('/pembayaran', 'Admin\TransaksiPembayaranController');
 
         Route::get('/cart/addCart', 'Admin\CartController@addCart');
 

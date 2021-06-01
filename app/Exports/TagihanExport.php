@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Exports;
 
 use Illuminate\Contracts\View\View;
@@ -12,7 +13,7 @@ use Maatwebsite\Excel\Concerns\Exportable;
 class TagihanExport implements FromView, WithEvents, ShouldAutoSize
 {
     use Exportable;
-    
+
     public function __construct($data, $sekolahInfo, $bulan, $jenisPembayaranTipe, $namaKelas)
     {
         $this->data = $data;
@@ -26,13 +27,13 @@ class TagihanExport implements FromView, WithEvents, ShouldAutoSize
     {
         //MEMANIPULASI CELL
         return [
-            AfterSheet::class    => function(AfterSheet $event) {
+            AfterSheet::class => function (AfterSheet $event) {
                 //CELL TERKAIT AKAN DI-MERGE
-                if($this->jenisPembayaranTipe === 'bulanan'){
+                if ($this->jenisPembayaranTipe === 'bulanan') {
                     $event->sheet->mergeCells('A1:P1');
                     $event->sheet->mergeCells('A2:P2');
                     $event->sheet->mergeCells('A3:P3');
-                }else{
+                } else {
                     $event->sheet->mergeCells('A1:G1');
                     $event->sheet->mergeCells('A2:G2');
                     $event->sheet->mergeCells('A3:G3');
@@ -45,7 +46,7 @@ class TagihanExport implements FromView, WithEvents, ShouldAutoSize
                 $event->sheet->mergeCells('A8:B8');
                 $event->sheet->mergeCells('A9:B9');
 
- 
+
                 //DEFINISIKAN STYLE UNTUK CELL
                 $styleArray = [
                     'font' => [
@@ -73,7 +74,7 @@ class TagihanExport implements FromView, WithEvents, ShouldAutoSize
                 //CELL TERAKAIT AKAN MENGGUNAKAN STYLE DARI $styleArray
                 // $event->sheet->getStyle('A6:F6')->applyFromArray($styleArray);
 
- 
+
                 //FORMATTING STYLE UNTUK CELL TERKAIT
                 $headCustomer = [
                     'alignment' => [

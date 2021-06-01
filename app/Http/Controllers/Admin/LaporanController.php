@@ -32,32 +32,32 @@ class LaporanController extends Controller
         $request->session()->forget(['jenisPembayaran']);
         $jenisPembayaran = JenisPembayaran::all();
 
-        if(!empty($request->mode)){
+        if (!empty($request->mode)) {
             $this->validate($request, [
                 'start_date' => 'required|date',
                 'end_date' => 'required|date',
             ]);
-            if($request->mode === 'simple'){
+            if ($request->mode === 'simple') {
                 $data = Detail_pembayaran::with('transaksi_pembayaran')->latest();
                 $data = $data->whereHas('transaksi_pembayaran', function ($query) {
                     $query->where('status', 'settlement');
                 });
-            }else{
+            } else {
                 $data = TransaksiPembayaran::with('detail_pembayaran', 'siswa')->latest()->where('status', 'settlement');
             }            // return $data->get();
         }
 
         // dd($data->get());
 
-        if(!empty($request->jenisPembayaran)){
+        if (!empty($request->jenisPembayaran)) {
             $this->validate($request, [
                 'mode' => 'required',
             ]);
             $this->jenisPembayaran = $request->jenisPembayaran;
 
-            if($request->mode === 'simple'){
+            if ($request->mode === 'simple') {
                 $data = $data->where('nama_pembayaran', $request->jenisPembayaran);
-            }else{
+            } else {
                 $data = $data->whereHas('detail_pembayaran', function ($query) {
                     $query->where('nama_pembayaran', $this->jenisPembayaran);
                 });
@@ -83,20 +83,20 @@ class LaporanController extends Controller
             session(['start_date' => $start_date]);
             session(['end_date' => $end_date]);
             session(['mode' => $request->mode]);
-    
+
             $data = $data->whereBetween('created_at', [$start_date, $end_date]);
             // dd($data->get());
             return view('admin.laporan.index')
-                                ->with('jenisPembayaran', $jenisPembayaran)
-                                ->with('data', $data->get());
+                ->with('jenisPembayaran', $jenisPembayaran)
+                ->with('data', $data->get());
         }
         // return $data->get();
         return view('admin.laporan.index', compact('jenisPembayaran'));
-        
     }
 
-    public function laporanPembayaranPdf(Request $request){
-        
+    public function laporanPembayaranPdf(Request $request)
+    {
+
         $data = $this->filterPembayaran($request);
 
         ($request->session()->get('mode') === 'simple') ? $total = $data->sum('harga') : $total = $data->sum('total');
@@ -114,7 +114,8 @@ class LaporanController extends Controller
         return $pdf->stream('laporan-transaksi-pembayaran.pdf');
     }
 
-    public function laporanPembayaranExcel(Request $request){
+    public function laporanPembayaranExcel(Request $request)
+    {
         $data = $this->filterPembayaran($request);
 
         ($request->session()->get('mode') === 'simple') ? $total = $data->sum('harga') : $total = $data->sum('total');
@@ -124,22 +125,22 @@ class LaporanController extends Controller
 
     public function filterPembayaran($request)
     {
-        if($request->session()->get('mode') === 'simple'){
+        if ($request->session()->get('mode') === 'simple') {
             $data = Detail_pembayaran::with('transaksi_pembayaran')->latest();
             $data = $data->whereHas('transaksi_pembayaran', function ($query) {
                 $query->where('status', 'settlement');
             });
-        }else{
+        } else {
             $data = TransaksiPembayaran::with('detail_pembayaran', 'siswa')->latest()->where('status', 'settlement');
         }
-        
-        if(!empty($request->session()->get('jenisPembayaran'))){
+
+        if (!empty($request->session()->get('jenisPembayaran'))) {
 
             $this->jenisPembayaran = $request->session()->get('jenisPembayaran');
 
-            if($request->session()->get('mode') === 'simple'){
+            if ($request->session()->get('mode') === 'simple') {
                 $data = $data->where('nama_pembayaran', $this->jenisPembayaran);
-            }else{
+            } else {
                 $data = $data->whereHas('detail_pembayaran', function ($query) {
                     $query->where('nama_pembayaran', $this->jenisPembayaran);
                 });
@@ -158,16 +159,15 @@ class LaporanController extends Controller
         $jenisPembayaranTipe = '';
 
         $tagihan = Tagihan::with('siswa', 'jenis_pembayaran', 'tagihan_detail');
-        
-        if(!empty($request->jenisPembayaran)){
+
+        if (!empty($request->jenisPembayaran)) {
             $jenisPembayaranTipe = JenisPembayaran::findOrFail($request->jenisPembayaran)->tipe;
             $tagihan = $tagihan->where('jenis_pembayaran_id', $request->jenisPembayaran);
             session(['jenisPembayaranTipe' => $jenisPembayaranTipe]);
             session(['jenisPembayaran' => $request->jenisPembayaran]);
-            
         }
 
-        if(!empty($request->kelas_id)){
+        if (!empty($request->kelas_id)) {
             $this->kelas_id = $request->kelas_id;
             $tagihan = $tagihan->whereHas('siswa', function ($query) {
                 $query->where('kelas_id', $this->kelas_id);
@@ -176,7 +176,7 @@ class LaporanController extends Controller
             session(['nama_kelas' => $namaKelas]);
             session(['kelas_id' => $request->kelas_id]);
         }
-        
+
         return view('admin.laporan.laporanTagihan', [
             'jenisPembayaran' => JenisPembayaran::all(),
             'kelas' => Kelas::all(),
@@ -184,7 +184,6 @@ class LaporanController extends Controller
             'tagihan' => $tagihan->get()->sortBy('siswa.nama_lengkap'),
             'jenisPembayaranTipe' => $jenisPembayaranTipe,
         ]);
-        
     }
 
     public function laporanTagihanPdf(Request $request)
@@ -203,33 +202,31 @@ class LaporanController extends Controller
             ])->setPaper('a4', 'landscape');
 
         return $pdf->stream("laporan-tagihan-siswa.pdf");
-        
     }
 
     public function laporanTagihanExcel(Request $request)
     {
         $bulan = BulanHelper::getBulanSingkat();
-        
+
         $data = $this->filterTagihan($request);
 
         return (new TagihanExport(
-                        $data->get()->sortBy('siswa.nama_lengkap'), 
-                        $this->getSekolahi(), 
-                        $bulan, 
-                        $request->session()->get('jenisPembayaranTipe'), 
-                        $request->session()->get('nama_kelas')
-                    )
-            )->download('laporan-tagihan.xlsx');
+            $data->get()->sortBy('siswa.nama_lengkap'),
+            $this->getSekolahi(),
+            $bulan,
+            $request->session()->get('jenisPembayaranTipe'),
+            $request->session()->get('nama_kelas')
+        ))->download('laporan-tagihan.xlsx');
     }
 
     public function filterTagihan($request)
     {
-        
+
         $data = Tagihan::with('siswa', 'jenis_pembayaran', 'tagihan_detail');
 
         $data = $data->where('jenis_pembayaran_id', $request->session()->get('jenisPembayaran'));
 
-        if(!empty(request()->session()->get('kelas_id'))){
+        if (!empty(request()->session()->get('kelas_id'))) {
             $data = $data->whereHas('siswa', function ($query) {
                 $query->where('kelas_id', request()->session()->get('kelas_id'));
             });
