@@ -25,6 +25,12 @@
                                     <i class="fas fa-plus-circle px-2"></i>
                                 </a>
 
+                                {{-- <a href="{{ route('pembayaran.import.view') }}" class="btn btn-secondary btn-icon ml-2"
+                                    title="Import Excel New" data-toggle="tooltip" data-placement="top"
+                                    data-original-title="Import Data Pembayaran">
+                                    <i class="fas fa-file-import px-2"></i>
+                                </a> --}}
+
                                 <a href="#" class="btn btn-secondary btn-icon ml-2" onclick="handleImport()"
                                     title="Import Excel" data-toggle="tooltip" data-placement="top"
                                     data-original-title="Import Data Pembayaran">

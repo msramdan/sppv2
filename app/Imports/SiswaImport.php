@@ -16,28 +16,27 @@ class SiswaImport implements ToModel, WithHeadingRow
     // private $rows = 0;
     // public $limit = 12;
     /**
-    * @param array $row
-    *
-    * @return \Illuminate\Database\Eloquent\Model|null
-    */
+     * @param array $row
+     *
+     * @return \Illuminate\Database\Eloquent\Model|null
+     */
     public function model(array $row)
     {
         // dd($row);
         $tgl_lahir = date_format(date_create($row['tanggal_lahir']), "Y-m-d");
         $jk = ($row['jk'] === 'L') ? 'male' : 'female';
-        
+
         $kelas = Kelas::where('nama_kelas', '=', $row['kelas'])->get()->first();
-        
-        if(empty($kelas)){
-            
+
+        if (empty($kelas)) {
+
             $kelas = Kelas::create([
                 'nama_kelas' => $row['kelas']
             ]);
-            
         }
-        
+
         $tesid = uniqid();
-        
+
         $user = User::create([
             'name' => $row['nama'],
             'username' => $row['nis'],
@@ -47,7 +46,7 @@ class SiswaImport implements ToModel, WithHeadingRow
         ]);
 
         $user->assignRole('siswa');
-        
+
         $siswa = new Siswa([
             'nis' => $row['nis'],
             'nama_lengkap' => $row['nama'],
