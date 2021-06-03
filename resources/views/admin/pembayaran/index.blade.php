@@ -167,7 +167,7 @@
                             <small id="fileHelpId" class="form-text text-muted">Tipe file : xls, xlsx</small>
 
                             <small id="fileHelpId" class="form-text text-muted">Pastikan file upload sesuai format. <br> <a
-                                    href="{{ url('template/contoh_format_import_siswa.xlsx') }}">Download
+                                    href="{{ url('template/contoh_format_pembayaran.xlsx') }}">Download
                                     contoh format file xlsx <i class="fas fa-download ml-1   "></i></a></small>
                         </div>
 

@@ -139,8 +139,8 @@ class JenisPembayaranController extends Controller
 
         if ($request->has('semua_kelas')) {
             // update jenis pembayaran
-            $update['pembayaran_untuk'] = 'semua kelas';
-            $jenis_pembayaran->update($update);
+            // $update['pembayaran_untuk'] = 'semua kelas';
+            // $jenis_pembayaran->update($update);
 
             $semua_kelas = Kelas::pluck('id')->all();
 
@@ -148,7 +148,7 @@ class JenisPembayaranController extends Controller
 
             $this->createOrUpdateBatchTagihan($siswa, $request, $jenis_pembayaran, ['semua kelas']);
 
-            $jenis_pembayaran->update($update);
+            // $jenis_pembayaran->update($update);
 
             session()->flash('success', 'Data Berhasil Diupdate');
 
@@ -162,7 +162,7 @@ class JenisPembayaranController extends Controller
 
             $this->createOrUpdateBatchTagihan($siswa, $request, $jenis_pembayaran, ['semua siswa kelas', $request->semua_siswa_kelas]);
 
-            $jenis_pembayaran->update($update);
+            // $jenis_pembayaran->update($update);
 
             session()->flash('success', 'Data Berhasil Diupdate');
 
@@ -174,7 +174,7 @@ class JenisPembayaranController extends Controller
 
             $this->createOrUpdateBatchTagihan($siswa, $request, $jenis_pembayaran, ['per siswa', $request->per_siswa]);
 
-            $jenis_pembayaran->update($update);
+            // $jenis_pembayaran->update($update);
 
             session()->flash('success', 'Data Berhasil Diupdate');
 
@@ -283,10 +283,10 @@ class JenisPembayaranController extends Controller
 
         $tagihan_lama_detail = TagihanDetail::whereIn('tagihan_id', $tagihan_lama)->where('status', 'Lunas')->get()->pluck('id');
 
-        $detail_pembayaran = Detail_pembayaran::with('transaksi_pembayaran')->whereIn('tagihan_details_id', $tagihan_lama_detail)->get()->pluck('transaksi_pembayaran_id');
+        // $detail_pembayaran = Detail_pembayaran::with('transaksi_pembayaran')->whereIn('tagihan_details_id', $tagihan_lama_detail)->get()->pluck('transaksi_pembayaran_id');
 
         Detail_pembayaran::whereIn('tagihan_details_id', $tagihan_lama_detail)->delete();
-        TransaksiPembayaran::whereIn('id', $detail_pembayaran)->delete();
+        // TransaksiPembayaran::whereIn('id', $detail_pembayaran)->delete();
 
         Tagihan::where('jenis_pembayaran_id', $id)->delete();
     }

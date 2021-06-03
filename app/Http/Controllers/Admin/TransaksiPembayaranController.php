@@ -168,39 +168,34 @@ class TransaksiPembayaranController extends Controller
         return view('admin.pembayaran.cetak', compact('detail', 'sekolahInfo'));
     }
 
-    public function viewImport()
-    {
-        $siswa = Siswa::where('nama_lengkap', 'Nova Hassanah')->first();
+    // public function viewImport()
+    // {
+    //     $siswa = Siswa::where('nama_lengkap', 'Nova Hassanah')->first();
 
-        $jenis_pembayaran = JenisPembayaran::where('nama_pembayaran', 'per siswa nova hassanah')->first();
+    //     $jenis_pembayaran = JenisPembayaran::where('nama_pembayaran', 'per siswa nova hassanah')->first();
 
-        $tagihan = Tagihan::where('jenis_pembayaran_id', $jenis_pembayaran->id)->where('siswa_id', $siswa->id)->first();
+    //     $tagihan = Tagihan::where('jenis_pembayaran_id', $jenis_pembayaran->id)->where('siswa_id', $siswa->id)->first();
 
-        $detail_tagihan = TagihanDetail::where('tagihan_id', $tagihan->id)->where('keterangan', 'juli')->first();
+    //     $detail_tagihan = TagihanDetail::where('tagihan_id', $tagihan->id)->where('keterangan', 'juli')->first();
 
-        echo json_encode($detail_tagihan);
-        die;
-    }
+    //     echo json_encode($detail_tagihan);
+    //     die;
+    // }
 
     public function importExcel(Request $request)
     {
-        Excel::import(new PembayaranImport, $request->file('import_pembayaran'));
+        // Excel::import(new PembayaranImport, $request->file('import_pembayaran'));
+        try {
+            Excel::import(new PembayaranImport, $request->file('import_pembayaran'));
 
-        session()->flash('success', "Data Pembayaran berhasil di import");
+            session()->flash('success', "Data Pembayaran berhasil di import");
 
-        return redirect(route('pembayaran.index'));
+            return redirect(route('pembayaran.index'));
+        } catch (\Exception $e) {
+            // dd($e->getMessage());
+            session()->flash('error', "Format excel tidak sesuai");
 
-        // try {
-        //     Excel::import(new PembayaranImport, $request->file('import_pembayaran'));
-
-        //     session()->flash('success', "Data Pembayaran berhasil di import");
-
-        //     return redirect(route('pembayaran.index'));
-        // } catch (\Exception $e) {
-        //     dd($e->getMessage());
-        //     // session()->flash('error', "Format excel tidak sesuai");
-
-        //     // return redirect(route('pembayaran.index'));
-        // }
+            return redirect(route('pembayaran.index'));
+        }
     }
 }

@@ -6,6 +6,7 @@ use App\Models\Siswa;
 use App\Models\Tagihan;
 use App\JenisPembayaran;
 use App\Models\TagihanDetail;
+use App\Models\Tahunajaran;
 use Illuminate\Support\Collection;
 use App\Models\TransaksiPembayaran;
 use Maatwebsite\Excel\Concerns\ToCollection;
@@ -31,7 +32,11 @@ class PembayaranImport implements ToCollection, WithHeadingRow
                 'token' => $row['no_va_pmb']
             ]);
 
-            $jenis_pembayaran = JenisPembayaran::where('nama_pembayaran', $row['nama_pembayaran'])->first();
+            $tahun_ajaran = Tahunajaran::where('tahun_ajaran', $row['tahun_ajaran'])->first();
+
+            $jenis_pembayaran = JenisPembayaran::where('nama_pembayaran', $row['nama_pembayaran'])->where('tahunajaran_id', $tahun_ajaran->id)->first();
+
+            // dd($jenis_pembayaran);
 
             $tagihan = Tagihan::where('jenis_pembayaran_id', $jenis_pembayaran->id)->where('siswa_id', $siswa->id)->first();
 
@@ -69,7 +74,7 @@ class PembayaranImport implements ToCollection, WithHeadingRow
                 'sisa' => $sisaBayar
             ]);
 
-            return $pembayaran;
+            // return $pembayaran;
         }
     }
 }

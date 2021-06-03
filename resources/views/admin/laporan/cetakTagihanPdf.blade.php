@@ -202,11 +202,13 @@
                 <tr>
                     <th style="text-align: center">#</th>
                     <th style="text-align: center">NIS/Nama</th>
+
                     @if ($jenisPembayaranTipe === 'bulanan')
                         @foreach ($bulan as $item)
                             <th>{{ $item }}</th>
                         @endforeach
                         <th>Total</th>
+                        <th>Sisa</th>
                     @else
                         <th>Sisa</th>
                         <th>Total Bayar</th>
@@ -214,13 +216,16 @@
                             Status
                         </th>
                     @endif
+
                 </tr>
             </thead>
             <tbody>
                 @php
                     $grandTotal = 0;
                     $totalBayar = 0;
+                    $sisa = 0;
                 @endphp
+
                 @foreach ($data as $row)
                     <tr>
                         <td style="width: 30px">{{ $loop->iteration }}</td>
@@ -233,9 +238,12 @@
                             <td style="width: 100px; text-align:right;">
                                 @if ($row->tagihan_detail[0]->sisa != 0)
                                     {{ number_format($row->tagihan_detail[0]->sisa) }}
-
                                 @endif
+                                @php
+                                    $sisa += $row->tagihan_detail[0]->sisa;
+                                @endphp
                             </td>
+
                             <td style="width: 100px; text-align:right;">
                                 @if ($row->tagihan_detail[0]->total_bayar != 0)
 
@@ -243,13 +251,16 @@
                                     {{ number_format($row->tagihan_detail[0]->total_bayar) }}
                                     @php
                                         $totalBayar = $totalBayar + $row->tagihan_detail[0]->total_bayar;
+                                        $sisa += $row->tagihan_detail[0]->sisa;
                                     @endphp
                                 @endif
                             </td>
                         @endif
+
                         @php
                             $total = 0;
                         @endphp
+
                         @foreach ($row->tagihan_detail as $item)
                             <td style="width: 60px; text-align:center;">
                                 @if ($item->status === 'Lunas')
@@ -259,6 +270,7 @@
                                     @endphp
                                     {{-- <i class="fas fa-check-circle text-success" title="{{$item->status}}"></i> --}}
                                 @endif
+
                                 @if ($item->status === 'Belum Lunas')
                                     <span style="color: red">x</span>
                                     {{-- <i class="fas fa-times-circle text-danger"></i> --}}
@@ -270,28 +282,42 @@
                                 @endif
                             </td>
                         @endforeach
+
                         @php
-                            $grandTotal = $grandTotal + $total;
+                            $grandTotal += $total;
                         @endphp
+
                         @if ($jenisPembayaranTipe === 'bulanan')
                             <td style="width: 30px;text-align:right;">{{ number_format($total) }}</td>
-
+                            <td>
+                                {{ number_format($sisa) }}
+                            </td>
                         @endif
                     </tr>
                 @endforeach
+
                 @if ($jenisPembayaranTipe === 'bulanan')
                     <tr>
-                        <td colspan="12" style="text-align:right;"></td>
-                        <td colspan="2" style="text-align:right;">Total</td>
-                        <td style="text-align:right;">{{ number_format($grandTotal) }}</td>
+                        <td colspan="13" style="text-align:right;"></td>
+                        <td colspan="1" style="text-align:right;">Total asd</td>
+                        <td style="text-align:right;">{{ number_format($grandTotal) }}
+                        </td>
+                        <td style="text-align:right;">total sisa
+                        </td>
                     </tr>
+                    {{-- <tr>
+                        <td colspan="12" style="text-align:right;"></td>
+                        <td colspan="2" style="text-align:right;">Sisa</td>
+                        <td style="text-align:right;">{{ number_format($sisa) }}</td>
+                    </tr> --}}
                 @else
                     <tr>
                         {{-- <td colspan="14"style="text-align:right; border: 1px solid black;"></td> --}}
-                        <td colspan="3" style="text-align:right;">Total</td>
+                        <td colspan="3" style="text-align:right;">Total jaja</td>
                         <td style="text-align:right;">{{ number_format($totalBayar) }}</td>
                         <td></td>
                     </tr>
+
                 @endif
 
             </tbody>
