@@ -62,11 +62,13 @@
                     <th style="text-align:center; border: 1px solid black">Nis</th>
                     <th style="text-align:center; border: 1px solid black">Nama</th>
                     <th style="text-align:center; border: 1px solid black">Kelas</th>
+
                     @if ($jenisPembayaranTipe === 'bulanan')
                         @foreach ($bulan as $item)
                             <th style="text-align:center; border: 1px solid black">{{ $item }}</th>
                         @endforeach
-                        <th style="text-align:center; border: 1px solid black">Total</th>
+                        <th style="text-align:center; border: 1px solid black">Total asd</th>
+                        <th style="text-align:center; border: 1px solid black">Sisa asd</th>
                     @else
                         <th style="text-align:center; border: 1px solid black">Total Bayar</th>
                         <th style="text-align:center; border: 1px solid black">Sisa</th>
@@ -80,15 +82,22 @@
                 @php
                     $grandTotal = 0;
                     $totalBayar = 0;
+                    $totalSisa = 0;
+                    $sisa = 0;
                 @endphp
+
                 @forelse ($data as $row)
                     <tr>
                         <td style="text-align:center; border: 1px solid black">{{ $loop->iteration }}</td>
+
                         <td style="text-align:center; border: 1px solid black">{{ $row->siswa->nis }}</td>
+
                         <td style="text-align:left; border: 1px solid black">{{ $row->siswa->nama_lengkap }}</td>
+
                         <td style="text-align:left; border: 1px solid black">
                             {{ $row->siswa->kelas->nama_kelas }}
                         </td>
+
                         @if ($jenisPembayaranTipe !== 'bulanan')
                             <td style="text-align:right; border: 1px solid black">
                                 @if ($row->tagihan_detail[0]->total_bayar != 0)
@@ -126,17 +135,30 @@
                                     <br>
                                     <small style="margin-top: 0">Sisa: Rp.
                                         {{ number_format($item->sisa) }}</small>
+                                    @php
+                                        $sisa += $item->sisa;
+                                        $total += $item->total_bayar;
+                                    @endphp
                                 @endif
 
                             </td>
                         @endforeach
+
                         @php
-                            $grandTotal = $grandTotal + $total;
+                            $grandTotal += $total;
+                            $totalSisa += $sisa;
                         @endphp
+
                         @if ($jenisPembayaranTipe === 'bulanan')
                             <td style="text-align:right; border: 1px solid black;">{{ number_format($total) }}</td>
 
+                            <td style="text-align:right; border: 1px solid black;">{{ number_format($sisa) }}</td>
+                            @php
+                                // set sisa ke 0 lagi
+                                $sisa = 0;
+                            @endphp
                         @endif
+                        {{-- $jenisPembayaranTipe === 'bulanan' --}}
                     </tr>
 
 
@@ -145,17 +167,29 @@
                         <td colspan="5" class="text-center">Tidak ada data</td>
                     </tr>
                 @endforelse
+
                 @if ($jenisPembayaranTipe === 'bulanan')
                     <tr>
-                        <td colspan="14" style="text-align:right; border: 1px solid black;"></td>
-                        <td colspan="2" style="text-align:right; border: 1px solid black;">Total</td>
+                        <td colspan="15" style="text-align:right; border: 1px solid black;"></td>
+
+                        <td colspan="1" style="text-align:right; border: 1px solid black;">Total jaja</td>
+
                         <td style="text-align:right; border: 1px solid black;">{{ number_format($grandTotal) }}</td>
+
+                        <td style="text-align:right; border: 1px solid black;">total sisa
+                            {{ number_format($totalSisa) }}
+                        </td>
                     </tr>
                 @else
                     <tr>
                         {{-- <td colspan="14"style="text-align:right; border: 1px solid black;"></td> --}}
-                        <td colspan="4" style="text-align:right; border: 1px solid black;">Total</td>
+                        <td colspan="5" style="text-align:right; border: 1px solid black;">Total awok</td>
+
                         <td style="text-align:right; border: 1px solid black;">{{ number_format($totalBayar) }}</td>
+
+                        <td style="text-align:right; border: 1px solid black;">total sisa
+                            {{ number_format($totalSisa) }}
+                        </td>
                     </tr>
                 @endif
             </tbody>

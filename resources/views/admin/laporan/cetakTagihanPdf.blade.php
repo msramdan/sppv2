@@ -223,6 +223,7 @@
                 @php
                     $grandTotal = 0;
                     $totalBayar = 0;
+                    $totalSisa = 0;
                     $sisa = 0;
                 @endphp
 
@@ -239,9 +240,7 @@
                                 @if ($row->tagihan_detail[0]->sisa != 0)
                                     {{ number_format($row->tagihan_detail[0]->sisa) }}
                                 @endif
-                                @php
-                                    $sisa += $row->tagihan_detail[0]->sisa;
-                                @endphp
+
                             </td>
 
                             <td style="width: 100px; text-align:right;">
@@ -251,7 +250,6 @@
                                     {{ number_format($row->tagihan_detail[0]->total_bayar) }}
                                     @php
                                         $totalBayar = $totalBayar + $row->tagihan_detail[0]->total_bayar;
-                                        $sisa += $row->tagihan_detail[0]->sisa;
                                     @endphp
                                 @endif
                             </td>
@@ -261,14 +259,13 @@
                             $total = 0;
                         @endphp
 
-                        @foreach ($row->tagihan_detail as $item)
+                        @foreach ($row->tagihan_detail as $index => $item)
                             <td style="width: 60px; text-align:center;">
                                 @if ($item->status === 'Lunas')
                                     <span style="color: green">v</span>
                                     @php
-                                        $total = $total + $data->first()->jenis_pembayaran->harga;
+                                        $total += $data->first()->jenis_pembayaran->harga;
                                     @endphp
-                                    {{-- <i class="fas fa-check-circle text-success" title="{{$item->status}}"></i> --}}
                                 @endif
 
                                 @if ($item->status === 'Belum Lunas')
@@ -279,18 +276,26 @@
                                     <br>
                                     <small style="margin-top: 0">Sisa: Rp.
                                         {{ number_format($item->sisa) }}</small>
+                                    @php
+                                        $sisa += $item->sisa;
+                                        $total += $item->total_bayar;
+                                    @endphp
                                 @endif
                             </td>
                         @endforeach
 
                         @php
                             $grandTotal += $total;
+                            $totalSisa += $sisa;
                         @endphp
 
                         @if ($jenisPembayaranTipe === 'bulanan')
                             <td style="width: 30px;text-align:right;">{{ number_format($total) }}</td>
                             <td>
                                 {{ number_format($sisa) }}
+                                @php
+                                    $sisa = 0;
+                                @endphp
                             </td>
                         @endif
                     </tr>
@@ -302,7 +307,7 @@
                         <td colspan="1" style="text-align:right;">Total asd</td>
                         <td style="text-align:right;">{{ number_format($grandTotal) }}
                         </td>
-                        <td style="text-align:right;">total sisa
+                        <td style="text-align:right;">total sisa {{ number_format($totalSisa) }}
                         </td>
                     </tr>
                     {{-- <tr>
