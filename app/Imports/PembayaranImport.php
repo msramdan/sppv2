@@ -29,7 +29,7 @@ class PembayaranImport implements ToCollection, WithHeadingRow
                 'status' => $row['status'],
                 'total' => $row['dibayar'],
                 'users_id' => auth()->id(),
-                'token' => $row['no_va_pmb']
+                // 'token' => $row['no_va_pmb']
             ]);
 
             $tahun_ajaran = Tahunajaran::where('tahun_ajaran', $row['tahun_ajaran'])->first();
