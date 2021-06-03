@@ -149,6 +149,8 @@ Route::group(['middleware' => 'auth'], function () {
 
     //laporan tagihan
     Route::group(['middleware' => ['permission:laporan tagihan']], function () {
+        Route::get('/laporan/tagihan/get-jenis-pembayaran/{id}', 'Admin\LaporanController@GetJenisPembayaran')->name('laporan.tagihan.jp');
+
         Route::get('/laporan/tagihan', 'Admin\LaporanController@laporanTagihan')->name('laporan.tagihan');
 
         Route::get('/laporan/tagihanPdf', 'Admin\LaporanController@laporanTagihanPdf')->name('laporan.tagihanPdf');

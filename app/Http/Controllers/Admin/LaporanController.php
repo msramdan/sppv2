@@ -17,6 +17,7 @@ use App\Models\Detail_pembayaran;
 use App\Models\PengaturanSekolah;
 use App\Models\TransaksiPembayaran;
 use App\Http\Controllers\Controller;
+use App\Models\Tahunajaran;
 
 class LaporanController extends Controller
 {
@@ -183,7 +184,14 @@ class LaporanController extends Controller
             'bulan' => BulanHelper::getBulanSingkat(),
             'tagihan' => $tagihan->get()->sortBy('siswa.nama_lengkap'),
             'jenisPembayaranTipe' => $jenisPembayaranTipe,
+            'tahun_ajaran' => Tahunajaran::all()
         ]);
+    }
+
+    public function getJenisPembayaran($id)
+    {
+        $tahun_ajaran = Tahunajaran::with('jenis_pembayaran')->findOrFail($id);
+        return response()->json(['tahun_ajaran' => $tahun_ajaran], 200);
     }
 
     public function laporanTagihanPdf(Request $request)

@@ -32,12 +32,12 @@
                         <div class="card-body">
                             <form action="{{ route('laporan.tagihan') }}" method="GET">
                                 <div class="row">
-                                    <div class="col-md-6">
+                                    <div class="col-md-4">
                                         <div class="form-group">
                                             <label for="kelas_id">Kelas</label>
                                             <select name="kelas_id" id="kelas_id"
                                                 class="form-control @error('kelas_id') is-invalid @enderror">
-                                                <option value="">-Semua Kelas-</option>
+                                                <option value="" disabled selected>-Pilih Kelas-</option>
                                                 @foreach ($kelas as $item)
                                                     <option value="{{ $item->id }}" @if ($item->id == request()->kelas_id) selected @endif>
 
@@ -50,28 +50,57 @@
                                             @enderror
                                         </div>
                                     </div>
-                                    <div class="col-md-6">
 
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="tahun_ajaran">Tahun Ajaran</label>
+                                            <select name="tahun_ajaran" id="tahun-ajaran"
+                                                class="form-control @error('tahun_ajaran') is-invalid @enderror">
+                                                <option value="" disabled selected>-Pilih Tahun Ajaran-</option>
+                                                @foreach ($tahun_ajaran as $item)
+                                                    <option value="{{ $item->id }}" @if ($item->id == request()->tahun_ajaran) selected @endif>
+                                                        {{ $item->tahun_ajaran }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                            @error('tahun_ajaran')
+                                                <div class="text-danger small mt-1">{{ $message }}</div>
+                                            @enderror
+                                        </div>
+                                    </div>
+
+                                    {{-- {{ request()->jenis_pembayaran ? '' : 'style="display: none"' }} --}}
+                                    <div class="col-md-4" id="jenis-pembayaran-col" style="display: none">
                                         <div class="form-group">
                                             <label for="jenisPembayaran">Jenis Pembayaran</label>
-                                            <select class="form-control" name="jenisPembayaran" id="jenisPembayaran"
+                                            <select class="form-control" id="jenis-pembayaran" name="jenisPembayaran"
                                                 required>
-                                                <option value="">Pilih</option>
+                                                {{-- <option value="">Pilih</option>
                                                 @foreach ($jenisPembayaran as $item)
                                                     <option value="{{ $item->id }}"
                                                         {{ request()->jenisPembayaran == $item->id ? 'selected' : '' }}>
                                                         {{ $item->nama_pembayaran }}</option>
-                                                @endforeach
+                                                @endforeach --}}
                                             </select>
                                             @error('jenisPembayaran')
                                                 <div class="text-danger small mt-1">{{ $message }}</div>
                                             @enderror
                                         </div>
+
                                         <div class="form-group">
-                                            <button type="submit" class="btn btn-info float-right">Tampilkan</button>
+                                            <button type="submit" class="btn btn-info btn-block">Tampilkan</button>
                                         </div>
                                     </div>
                                 </div>
+
+                                {{-- <div class="row">
+                                    <div class="col-md-4"></div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <button type="submit" class="btn btn-info btn-block">Tampilkan</button>
+                                        </div>
+                                    </div>
+                                </div> --}}
                             </form>
                             <hr>
                             @if (!empty($jenisPembayaranTipe) && $tagihan->count() != 0)
@@ -97,31 +126,9 @@
     : request()->session()->get('nama_kelas') }}</strong>
                                     <br>
 
-                                    {{-- @if ($jenisPembayaranTipe === 'bebas')
-                                    <div class="text-right">
-                                        <span>
-                                            <i class="fas fa-check-circle text-success"></i>
-                                            @if ($tagihan->first()->jenis_pembayaran->lunas == 0)
-                                                -
-                                            @else
-                                                {{$tagihan->first()->jenis_pembayaran->lunas}} Orang
-                                            @endif
-                                        </span>
-                                        <span class="ml-3">
-                                            <i class="fas fa-times-circle text-danger"></i>
-                                            @if ($tagihan->first()->jenis_pembayaran->belum_lunas == 0)
-                                                -
-                                            @else
-                                                {{$tagihan->first()->jenis_pembayaran->belum_lunas}} Orang
-                                            @endif
-                                        </span>
-                                    </div>
-
-                                @endif --}}
-
                                 </div>
 
-                                <div class="table-responsive small  ">
+                                <div class="table-responsive small">
                                     {{-- @foreach ($data as $row) --}}
                                     <table class="table table-head-fixed text-nowrap table-bordered table-striped mt-3">
                                         <thead>
@@ -217,13 +224,40 @@
 
 @section('scripts')
     <script>
-        function handleDelete(id) {
-            let form = document.getElementById('deleteForm')
-            form.action = `./kelas/${id}`
-            console.log(form)
-            $('#deleteModal').modal('show')
-        }
+        $.ajaxSetup({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            }
+        });
+
+        $('#tahun-ajaran').on('click', function() {
+            console.log(this.value);
+
+            $.ajax({
+                type: 'GET',
+                url: '/laporan/tagihan/get-jenis-pembayaran/' + this.value,
+                success: function(data) {
+                    if (data.tahun_ajaran) {
+
+                        let jenis_pembayaran = '';
+
+                        jenis_pembayaran = data.tahun_ajaran.jenis_pembayaran;
+                        $('#jenis-pembayaran-col').show();
+
+                        // console.log(jenis_pembayaran)
+
+                        let option = '';
+
+                        $.each(jenis_pembayaran, function(key, val) {
+                            option +=
+                                `<option value="${val.id}" >${val.nama_pembayaran}</option>`;
+                        });
+
+                        $('#jenis-pembayaran').html(option);
+                    }
+                }
+            });
+        });
 
     </script>
-
 @endsection
