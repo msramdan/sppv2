@@ -151,14 +151,14 @@
                                                         {{ @$row->siswa->nama_lengkap }}
                                                     </td>
                                                     @if ($jenisPembayaranTipe !== 'bulanan')
-                                                        <td class="text-right">
+                                                        <td class="text-right">Rp.
                                                             {{ number_format($row->tagihan_detail[0]->total_bayar) }}
                                                         </td>
                                                         <td class="text-right">
                                                             @if ($row->tagihan_detail[0]->sisa == 0)
                                                                 -
                                                             @else
-                                                                {{ number_format($row->tagihan_detail[0]->sisa) }}
+                                                                Rp. {{ number_format($row->tagihan_detail[0]->sisa) }}
 
                                                             @endif
                                                         </td>

@@ -210,11 +210,9 @@
                         <th>Total</th>
                         <th>Sisa</th>
                     @else
+                        <th>Status</th>
                         <th>Sisa</th>
                         <th>Total Bayar</th>
-                        <th>
-                            Status
-                        </th>
                     @endif
 
                 </tr>
@@ -235,25 +233,6 @@
                             {{ @$row->siswa->kelas->nama_kelas }} <br>
                             {{ @$row->siswa->nama_lengkap }}
                         </td>
-                        @if ($jenisPembayaranTipe !== 'bulanan')
-                            <td style="width: 100px; text-align:right;">
-                                @if ($row->tagihan_detail[0]->sisa != 0)
-                                    {{ number_format($row->tagihan_detail[0]->sisa) }}
-                                @endif
-
-                            </td>
-
-                            <td style="width: 100px; text-align:right;">
-                                @if ($row->tagihan_detail[0]->total_bayar != 0)
-
-                                    {{-- @else --}}
-                                    {{ number_format($row->tagihan_detail[0]->total_bayar) }}
-                                    @php
-                                        $totalBayar = $totalBayar + $row->tagihan_detail[0]->total_bayar;
-                                    @endphp
-                                @endif
-                            </td>
-                        @endif
 
                         @php
                             $total = 0;
@@ -271,11 +250,11 @@
                                 @if ($item->status === 'Belum Lunas')
                                     <span style="color: red">x</span>
                                     {{-- <i class="fas fa-times-circle text-danger"></i> --}}
-                                    <small style="margin-bottom: 0">Dibayar: Rp.
-                                        {{ number_format($item->total_bayar) }}</small>
+                                    <small style="margin-bottom: 0">Dibayar:
+                                        Rp. {{ number_format($item->total_bayar) }}</small>
                                     <br>
-                                    <small style="margin-top: 0">Sisa: Rp.
-                                        {{ number_format($item->sisa) }}</small>
+                                    <small style="margin-top: 0">Sisa:
+                                        Rp. {{ number_format($item->sisa) }}</small>
                                     @php
                                         $sisa += $item->sisa;
                                         $total += $item->total_bayar;
@@ -284,15 +263,30 @@
                             </td>
                         @endforeach
 
+                        @if ($jenisPembayaranTipe !== 'bulanan')
+                            <td style="width: 100px; text-align:right;">
+                                Rp. {{ number_format($row->tagihan_detail[0]->sisa) }}
+                            </td>
+
+                            <td style="width: 100px; text-align:right;">
+                                Rp. {{ number_format($row->tagihan_detail[0]->total_bayar) }}
+
+                                @if ($row->tagihan_detail[0]->total_bayar != 0)
+                                    @php
+                                        $totalBayar = $totalBayar + $row->tagihan_detail[0]->total_bayar;
+                                    @endphp
+                                @endif
+                            </td>
+                        @endif
+
                         @php
                             $grandTotal += $total;
                             $totalSisa += $sisa;
                         @endphp
 
                         @if ($jenisPembayaranTipe === 'bulanan')
-                            <td style="width: 30px;text-align:right;">{{ number_format($total) }}</td>
-                            <td>
-                                {{ number_format($sisa) }}
+                            <td style="width: 30px;text-align:right;">Rp. {{ number_format($total) }}</td>
+                            <td>Rp. {{ number_format($sisa) }}
                                 @php
                                     $sisa = 0;
                                 @endphp
@@ -304,10 +298,10 @@
                 @if ($jenisPembayaranTipe === 'bulanan')
                     <tr>
                         <td colspan="13" style="text-align:right;"></td>
-                        <td colspan="1" style="text-align:right;">Total asd</td>
-                        <td style="text-align:right;">{{ number_format($grandTotal) }}
+                        <td colspan="1" style="text-align:right;">Grand Total</td>
+                        <td style="text-align:right;">Rp. {{ number_format($grandTotal) }}
                         </td>
-                        <td style="text-align:right;">total sisa {{ number_format($totalSisa) }}
+                        <td style="text-align:right;">Rp. {{ number_format($totalSisa) }}
                         </td>
                     </tr>
                     {{-- <tr>
@@ -318,9 +312,9 @@
                 @else
                     <tr>
                         {{-- <td colspan="14"style="text-align:right; border: 1px solid black;"></td> --}}
-                        <td colspan="3" style="text-align:right;">Total jaja</td>
-                        <td style="text-align:right;">{{ number_format($totalBayar) }}</td>
-                        <td></td>
+                        <td colspan="3"></td>
+                        <td colspan="1" style="text-align:right;">Grand Total</td>
+                        <td style="text-align:right;">Rp. {{ number_format($totalBayar) }}</td>
                     </tr>
 
                 @endif

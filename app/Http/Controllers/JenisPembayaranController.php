@@ -139,7 +139,7 @@ class JenisPembayaranController extends Controller
 
         if ($request->has('semua_kelas')) {
             // update jenis pembayaran
-            // $update['pembayaran_untuk'] = 'semua kelas';
+            // $update['tipe'] = 'semua kelas';
             // $jenis_pembayaran->update($update);
 
             $semua_kelas = Kelas::pluck('id')->all();
@@ -148,7 +148,7 @@ class JenisPembayaranController extends Controller
 
             $this->createOrUpdateBatchTagihan($siswa, $request, $jenis_pembayaran, ['semua kelas']);
 
-            // $jenis_pembayaran->update($update);
+            $jenis_pembayaran->update($update);
 
             session()->flash('success', 'Data Berhasil Diupdate');
 
@@ -162,7 +162,7 @@ class JenisPembayaranController extends Controller
 
             $this->createOrUpdateBatchTagihan($siswa, $request, $jenis_pembayaran, ['semua siswa kelas', $request->semua_siswa_kelas]);
 
-            // $jenis_pembayaran->update($update);
+            $jenis_pembayaran->update($update);
 
             session()->flash('success', 'Data Berhasil Diupdate');
 
@@ -174,7 +174,7 @@ class JenisPembayaranController extends Controller
 
             $this->createOrUpdateBatchTagihan($siswa, $request, $jenis_pembayaran, ['per siswa', $request->per_siswa]);
 
-            // $jenis_pembayaran->update($update);
+            $jenis_pembayaran->update($update);
 
             session()->flash('success', 'Data Berhasil Diupdate');
 
