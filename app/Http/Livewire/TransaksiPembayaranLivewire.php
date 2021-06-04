@@ -7,6 +7,7 @@ use App\Models\Tagihan;
 use Livewire\Component;
 use App\JenisPembayaran;
 use App\Models\TagihanDetail;
+use App\Models\Tahunajaran;
 use Illuminate\Support\Facades\DB;
 use App\Models\TransaksiPembayaran;
 use Gloudemans\Shoppingcart\Facades\Cart;
@@ -14,7 +15,7 @@ use Gloudemans\Shoppingcart\Facades\Cart;
 
 class TransaksiPembayaranLivewire extends Component
 {
-    public $tagihan_id, $siswa, $selected_siswa, $tagihan, $dibayar, $sisa, $nominal, $nominal_string, $keterangan, $nama_pembayaran, $error_message, $flash_message, $modal = false, $cart = [];
+    public $tagihan_id, $siswa, $selected_siswa, $tagihan, $dibayar, $sisa, $nominal, $nominal_string, $keterangan, $nama_pembayaran, $tahun_ajaran, $selected_tahun, $nama_tahun_ajaran, $error_message, $flash_message, $modal = false, $cart = [];
 
     public $search = '';
 
@@ -53,11 +54,30 @@ class TransaksiPembayaranLivewire extends Component
 
         $this->tagihan = Tagihan::with('siswa', 'tagihan_detail', 'jenis_pembayaran')->where('siswa_id', $this->selected_siswa->id)->get();
 
+        $this->selected_tahun = 'semua';
+        $this->tahun_ajaran = Tahunajaran::get();
+        // dd($this->tagihan);
+
         $this->search = '';
         $this->siswa = '';
         $this->flash_message = '';
 
         Cart::session(auth()->id())->clear();
+    }
+
+    public function updatedSelectedTahun()
+    {
+        $tahun = $this->selected_tahun;
+
+        if ($tahun == 'semua') {
+            $this->tagihan = Tagihan::with('siswa', 'tagihan_detail', 'jenis_pembayaran')->where('siswa_id', $this->selected_siswa->id)->get();
+        } else {
+            $this->tagihan = Tagihan::with('siswa', 'tagihan_detail', 'jenis_pembayaran')->whereHas('jenis_pembayaran', function ($q) use ($tahun) {
+                $q->where('tahunajaran_id', $tahun);
+            })->where('siswa_id', $this->selected_siswa->id)->get();
+
+            $this->nama_tahun_ajaran = Tahunajaran::findOrFail($tahun);
+        }
     }
 
     public function addToCart()
