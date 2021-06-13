@@ -22,14 +22,14 @@ class PembayaranImport implements ToCollection, WithHeadingRow
         foreach ($rows as $row) {
             $siswa = Siswa::where('nama_lengkap', $row['nama_siswa'])->first();
 
-            $pembayaran =  TransaksiPembayaran::create([
+            $pembayaran = TransaksiPembayaran::create([
                 'kode_pembayaran' => 'LKT-' . rand(),
                 'siswa_id' => $siswa->id,
                 'metode_pembayaran' => $row['metode_pembayaran'],
                 'status' => $row['status'],
                 'total' => $row['dibayar'],
                 'users_id' => auth()->id(),
-                // 'token' => $row['no_va_pmb']
+                'token' => $row['no_va_pmb']
             ]);
 
             $tahun_ajaran = Tahunajaran::where('tahun_ajaran', $row['tahun_ajaran'])->first();

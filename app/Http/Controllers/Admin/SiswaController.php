@@ -32,37 +32,37 @@ class SiswaController extends Controller
     public function index(Request $request)
     {
         $request->session()->forget(['jenis_kelamin', 'status', 'kelas_id', 'keyword']);
-        
+
         $siswa = Siswa::orderBy('nama_lengkap', 'asc');
         $kelas = Kelas::all();
 
-        if(!empty($request->jk)){
+        if (!empty($request->jk)) {
             $siswa = $siswa->where('jenis_kelamin', $request->jk);
             session(['jenis_kelamin' => $request->jk]);
         }
 
-        if(!empty($request->status)){
+        if (!empty($request->status)) {
             $siswa = $siswa->where('status', $request->status);
             session(['status' => $request->status]);
         }
 
-        if(!empty($request->kelas_id)){
+        if (!empty($request->kelas_id)) {
             $siswa = $siswa->where('kelas_id', $request->kelas_id);
             session(['kelas_id' => $request->kelas_id]);
         }
 
         if (!empty($request->keyword)) {
-            $siswa = $siswa->where('nama_lengkap','like',"%".$request->keyword."%")
-                            ->orWhere('nis', 'like', "%$request->keyword%");
+            $siswa = $siswa->where('nama_lengkap', 'like', "%" . $request->keyword . "%")
+                ->orWhere('nis', 'like', "%$request->keyword%");
             $siswa = $siswa->orWhereHas('kelas', function ($query) {
-                $query->where('nama_kelas', 'like', "%".request()->keyword."%");
+                $query->where('nama_kelas', 'like', "%" . request()->keyword . "%");
             });
             session(['keyword' => $request->keyword]);
         }
 
         return view('admin.siswa.index')
-                ->with('siswa', $siswa->paginate(10))
-                ->with('kelas', $kelas);
+            ->with('siswa', $siswa->paginate(10))
+            ->with('kelas', $kelas);
     }
 
     /**
@@ -86,9 +86,9 @@ class SiswaController extends Controller
     {
 
         $gambar = '';
-        if($request->hasFile('foto_siswa')){
+        if ($request->hasFile('foto_siswa')) {
             $gambar = $this->uploadGambar($request);
-        }else{
+        } else {
             $gambar = "siswa_default.png";
         }
 
@@ -139,7 +139,7 @@ class SiswaController extends Controller
 
         $this->siswaId = $id;
         $tahun_ajaran = Tahunajaran::all();
-        
+
         $pembayaran = Detail_pembayaran::with('transaksi_pembayaran')->whereHas('transaksi_pembayaran', function ($query) {
             $query->where('siswa_id', $this->siswaId);
         })->latest()->get();
@@ -183,16 +183,16 @@ class SiswaController extends Controller
             'status',
             'kelas_id',
         ]);
-        
+
         $user = User::findOrFail($siswa->user_id);
         $user->name = $request->nama_lengkap;
         $user->username = $request->nis;
         $user->update();
 
-        if($request->hasFile('foto_siswa')){
+        if ($request->hasFile('foto_siswa')) {
 
-            if($siswa->foto !== "siswa_default.png"){
-                File::delete('img/siswa/'.$siswa->foto);
+            if ($siswa->foto !== "siswa_default.png") {
+                File::delete('img/siswa/' . $siswa->foto);
             }
 
             $gambar = $this->uploadGambar($request);
@@ -216,17 +216,17 @@ class SiswaController extends Controller
      */
     public function destroy(Siswa $siswa)
     {
-        if($siswa->status === "Aktif"){
+        if ($siswa->status === "Aktif") {
             session()->flash('error', "Data Siswa $siswa->nama_lengkap tidak bisa hapus!!");
 
             return redirect(route('siswa.index'));
         }
 
-        if($siswa->foto !== "siswa_default.png"){
-            File::delete('img/siswa/'.$siswa->foto);
+        if ($siswa->foto !== "siswa_default.png") {
+            File::delete('img/siswa/' . $siswa->foto);
         }
 
-        
+
         $siswa->user->delete();
         $siswa->delete();
 
@@ -260,16 +260,16 @@ class SiswaController extends Controller
         $bulan = \BulanHelper::getBulan();
         // $tagihan = $request->jenisPembayaran_id;
 
-        foreach($request->jenisPembayaran_id as $item){
+        foreach ($request->jenisPembayaran_id as $item) {
             $jenisPembayaran = JenisPembayaran::find($item);
-            
+
             $tagihan = Tagihan::create([
                 'siswa_id' => $request->siswaId,
                 'jenis_pembayaran_id' => $jenisPembayaran->id,
             ]);
 
-            if($jenisPembayaran->tipe === "bulanan"){
-                foreach($bulan as $b){
+            if ($jenisPembayaran->tipe === "bulanan") {
+                foreach ($bulan as $b) {
                     TagihanDetail::create([
                         'tagihan_id' => $tagihan->id,
                         'status' => 'Belum Lunas',
@@ -278,7 +278,7 @@ class SiswaController extends Controller
                         'sisa' => $jenisPembayaran->harga,
                     ]);
                 }
-            }else{
+            } else {
                 TagihanDetail::create([
                     'tagihan_id' => $tagihan->id,
                     'status' => 'Belum Lunas',
@@ -298,17 +298,17 @@ class SiswaController extends Controller
         // return $id;
         $tagihan = Tagihan::with('tagihan_detail')->findOrFail($id);
         $tagihanDetail = TagihanDetail::where('tagihan_id', $tagihan->id);
-        $count = $tagihanDetail->where('total_bayar','<>', '0')->count();
-        if($count > 0){
+        $count = $tagihanDetail->where('total_bayar', '<>', '0')->count();
+        if ($count > 0) {
             session()->flash('error', "Tagihan Gagal Dihapus!");
 
             return redirect()->back();
         }
-        
-        
+
+
         $tagihan->delete();
         $tagihanDetail = TagihanDetail::where('tagihan_id', $tagihan->id)->delete();
-        
+
         session()->flash('success', "Tagihan Berhasil Dihapus");
 
         return redirect()->back();
@@ -333,7 +333,7 @@ class SiswaController extends Controller
 
     public function excel(Request $request)
     {
-        
+
         $siswa = $this->filter($request);
         $sekolahInfo = PengaturanSekolah::all()->first();
         return (new SiswaExport($siswa, $sekolahInfo))->download('Data_siswa.xlsx');
@@ -343,27 +343,27 @@ class SiswaController extends Controller
     {
         $siswa = Siswa::orderBy('nama_lengkap', 'asc');
 
-        if(!empty($request->session()->get('jenis_kelamin'))){
+        if (!empty($request->session()->get('jenis_kelamin'))) {
             // return $request->session()->get('jenis_kelamin');
             $siswa = $siswa->where('jenis_kelamin', $request->session()->get('jenis_kelamin'));
         }
 
-        if(!empty($request->session()->get('status'))){
+        if (!empty($request->session()->get('status'))) {
             $siswa = $siswa->where('status', $request->session()->get('status'));
         }
 
-        if(!empty($request->session()->get('kelas_id'))){
+        if (!empty($request->session()->get('kelas_id'))) {
             $siswa = $siswa->where('kelas_id', $request->session()->get('kelas_id'));
         }
 
         if (!empty($request->session()->get('keyword'))) {
-            $siswa = $siswa->where('nama_lengkap','like',"%".$request->session()->get('keyword')."%")
-                            ->orWhere('nis', 'like', "%".$request->session()->get('keyword')."%");
-            $siswa = $siswa->orWhereHas('kelas', function ($query) use($request) {
-                $query->where('nama_kelas', 'like', "%".$request->session()->get('keyword')."%");
+            $siswa = $siswa->where('nama_lengkap', 'like', "%" . $request->session()->get('keyword') . "%")
+                ->orWhere('nis', 'like', "%" . $request->session()->get('keyword') . "%");
+            $siswa = $siswa->orWhereHas('kelas', function ($query) use ($request) {
+                $query->where('nama_kelas', 'like', "%" . $request->session()->get('keyword') . "%");
             });
         }
-        
+
         return $siswa->get();
     }
 
@@ -371,17 +371,21 @@ class SiswaController extends Controller
     public function import(Request $request)
     {
         $this->validate($request, [
-            'import_siswa' => 'required|nullable|mimes:xls,xlsx|max:15'
+            'import_siswa' => 'required|mimes:xls,xlsx'
         ]);
-        
 
-        $file = request()->file('import_siswa');
-              
-        Excel::import(new SiswaImport, request()->file('import_siswa'));
-        
-        session()->flash('success', "Data siswa Berhasil di import");
+        try {
+            $file = request()->file('import_siswa');
 
-        //redirect user
-        return redirect(route('siswa.index'));
+            Excel::import(new SiswaImport, request()->file('import_siswa'));
+
+            session()->flash('success', "Data siswa Berhasil di import");
+
+            return redirect(route('siswa.index'));
+        } catch (\Exception $e) {
+            session()->flash('error', "Format excel tidak sesuai");
+
+            return redirect(route('siswa.index'));
+        }
     }
 }

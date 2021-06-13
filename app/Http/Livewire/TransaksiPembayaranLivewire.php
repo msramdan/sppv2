@@ -42,17 +42,18 @@ class TransaksiPembayaranLivewire extends Component
 
     public function updatedSearch()
     {
-        if ($this->search != '') {
-            $this->siswa = Siswa::with('kelas')->where('nama_lengkap', 'like', '%' . $this->search . '%')
-                ->orWhere('nis', 'like', '%' . $this->search . '%')->take(5)->get();
-        }
+        // if ($this->search != '') {
+        $this->siswa = Siswa::with('kelas')
+            ->where('nama_lengkap', 'like', '%' . $this->search . '%')
+            ->orWhere('nis', 'like', '%' . $this->search . '%')->limit(5)->get();
+        // }
     }
 
     public function selectSiswa($id)
     {
         $this->selected_siswa = Siswa::with('kelas')->findOrFail($id);
 
-        $this->tagihan = Tagihan::with('siswa', 'tagihan_detail', 'jenis_pembayaran')->where('siswa_id', $this->selected_siswa->id)->get();
+        $this->tagihan = Tagihan::with('tagihan_detail', 'jenis_pembayaran')->where('siswa_id', $id)->get();
 
         $this->selected_tahun = 'semua';
         $this->tahun_ajaran = Tahunajaran::get();

@@ -184,7 +184,10 @@ class TransaksiPembayaranController extends Controller
 
     public function importExcel(Request $request)
     {
-        // Excel::import(new PembayaranImport, $request->file('import_pembayaran'));
+        $this->validate($request, [
+            'import_pembayaran' => 'required|mimes:xls,xlsx'
+        ]);
+
         try {
             Excel::import(new PembayaranImport, $request->file('import_pembayaran'));
 
