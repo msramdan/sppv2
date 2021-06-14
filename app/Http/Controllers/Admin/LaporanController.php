@@ -197,6 +197,7 @@ class LaporanController extends Controller
     public function laporanTagihanPdf(Request $request)
     {
         $bulan = BulanHelper::getBulanSingkat();
+        $bulanLengkap = BulanHelper::getBulan();
 
         $data = $this->filterTagihan($request);
 
@@ -205,6 +206,7 @@ class LaporanController extends Controller
                 'data' => $data->get()->sortBy('siswa.nama_lengkap'),
                 'jenisPembayaranTipe' => $request->session()->get('jenisPembayaranTipe'),
                 'bulan' => $bulan,
+                'bulanLengkap' => $bulanLengkap,
                 'sekolahInfo' => $this->getSekolahi(),
                 'namaKelas' => $request->session()->get('nama_kelas'),
             ])->setPaper('a4', 'landscape');

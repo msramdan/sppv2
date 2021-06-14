@@ -139,18 +139,6 @@
     </div>
 
     <div class="info">
-        {{-- @if (!empty($start_date))
-            <table>
-                <tr>
-                    <td>Dari Tanggal</td>
-                    <td>: {{ date_format(date_create($start_date), "d/m/Y") }}</td>
-                </tr>
-                <tr>
-                    <td>Sampai Tanggal</td>
-                    <td>: {{ date_format(date_create($end_date), "d/m/Y") }}</td>
-                </tr>
-            </table>
-        @endif --}}
         <strong>Laporan Tagihan </strong> <br>
         <table style="margin-left: auto; margin-right: auto;">
             <tr>
@@ -184,6 +172,7 @@
                 <td>{{ $namaKelas == '' ? 'Semua Kelas' : $namaKelas }}</td>
             </tr>
         </table>
+
         <table>
             <tr>
                 <td>Keterangan :</td>
@@ -223,12 +212,39 @@
                     $totalBayar = 0;
                     $totalSisa = 0;
                     $sisa = 0;
+                    $totalPerBulan = [];
+
+                    $totalBulanJanuari = 0;
+                    $totalBulanFebruari = 0;
+                    $totalBulanMaret = 0;
+                    $totalBulanApril = 0;
+                    $totalBulanMei = 0;
+                    $totalBulanJuni = 0;
+                    $totalBulanJuli = 0;
+                    $totalBulanAgustus = 0;
+                    $totalBulanSeptember = 0;
+                    $totalBulanOktober = 0;
+                    $totalBulanNovember = 0;
+                    $totalBulanDesember = 0;
+
+                    $sisaBulanJanuari = 0;
+                    $sisaBulanFebruari = 0;
+                    $sisaBulanMaret = 0;
+                    $sisaBulanApril = 0;
+                    $sisaBulanMei = 0;
+                    $sisaBulanJuni = 0;
+                    $sisaBulanJuli = 0;
+                    $sisaBulanAgustus = 0;
+                    $sisaBulanSeptember = 0;
+                    $sisaBulanOktober = 0;
+                    $sisaBulanNovember = 0;
+                    $sisaBulanDesember = 0;
                 @endphp
 
                 @foreach ($data as $row)
                     <tr>
-                        <td style="width: 30px">{{ $loop->iteration }}</td>
-                        <td>
+                        <td width="10px">{{ $loop->iteration }}</td>
+                        <td width="80">
                             {{ @$row->siswa->nis }} -
                             {{ @$row->siswa->kelas->nama_kelas }} <br>
                             {{ @$row->siswa->nama_lengkap }}
@@ -247,6 +263,16 @@
                                     @endphp
                                 @endif
 
+                                @php
+                                    foreach ($bulanLengkap as $value) {
+                                        // jika nama bulan sama dengan daftar nama bulan
+                                        if ($value == $item->keterangan) {
+                                            ${'totalBulan' . $value} += $item->total_bayar;
+                                            ${'sisaBulan' . $value} += $item->sisa;
+                                        }
+                                    }
+                                @endphp
+
                                 @if ($item->status === 'Belum Lunas')
                                     <span style="color: red">x</span>
                                     {{-- <i class="fas fa-times-circle text-danger"></i> --}}
@@ -262,14 +288,15 @@
                                 @endif
                             </td>
                         @endforeach
+                        {{-- <td>Total BLN:</td> --}}
 
                         @if ($jenisPembayaranTipe !== 'bulanan')
                             <td style="width: 100px; text-align:right;">
-                                Rp. {{ number_format($row->tagihan_detail[0]->sisa) }}
+                                1 Rp. {{ number_format($row->tagihan_detail[0]->sisa) }}
                             </td>
 
                             <td style="width: 100px; text-align:right;">
-                                Rp. {{ number_format($row->tagihan_detail[0]->total_bayar) }}
+                                2 Rp. {{ number_format($row->tagihan_detail[0]->total_bayar) }}
 
                                 @if ($row->tagihan_detail[0]->total_bayar != 0)
                                     @php
@@ -285,8 +312,8 @@
                         @endphp
 
                         @if ($jenisPembayaranTipe === 'bulanan')
-                            <td style="width: 30px;text-align:right;">Rp. {{ number_format($total) }}</td>
-                            <td>Rp. {{ number_format($sisa) }}
+                            <td style="width: 20px; text-align:right; margin:0;">Rp. {{ number_format($total) }}</td>
+                            <td style="width: 20px; text-align:right; margin:0;">Rp. {{ number_format($sisa) }}
                                 @php
                                     $sisa = 0;
                                 @endphp
@@ -297,13 +324,30 @@
 
                 @if ($jenisPembayaranTipe === 'bulanan')
                     <tr>
-                        <td colspan="13" style="text-align:right;"></td>
-                        <td colspan="1" style="text-align:right;">Grand Total</td>
+                        <td colspan="2"></td>
+                        @foreach ($bulanLengkap as $index => $item)
+                            <td style="text-align:center;">
+                                <small> Total: Rp. {{ number_format(${'totalBulan' . $item}) }}</small>
+                                <br>
+                                <small>Sisa: Rp. {{ number_format(${'sisaBulan' . $item}) }}</small>
+                            </td>
+                        @endforeach
                         <td style="text-align:right;">Rp. {{ number_format($grandTotal) }}
                         </td>
                         <td style="text-align:right;">Rp. {{ number_format($totalSisa) }}
                         </td>
                     </tr>
+
+                    {{-- <tr>
+                        <td colspan="13" style="text-align:right;">
+                        </td>
+                        <td colspan="1" style="text-align:right;">Grand Total</td>
+                        <td style="text-align:right;">Rp. {{ number_format($grandTotal) }}
+                        </td>
+                        <td style="text-align:right;">Rp. {{ number_format($totalSisa) }}
+                        </td>
+                    </tr> --}}
+
                     {{-- <tr>
                         <td colspan="12" style="text-align:right;"></td>
                         <td colspan="2" style="text-align:right;">Sisa</td>
@@ -318,19 +362,9 @@
                     </tr>
 
                 @endif
-
             </tbody>
         </table>
-        {{-- <div style="text-align: right"> --}}
-        {{-- <div style="float: right">
-                <p>Tanjungpinang, 12-2-2021</p>
-                <p>Bendahara</p>
-                <br>
-                <br>
-                <br>
-                <p>________________</p>
 
-            </div> --}}
         <table border="0" style="width: 100%; font-size: 20px">
             <tr>
                 <td></td>
@@ -357,14 +391,6 @@
                 <td style="text-align: center">_________________</td>
             </tr>
         </table>
-
-        {{-- </div> --}}
-        {{-- @else --}}
-
-
-
-        {{-- @endif --}}
-
     </div>
 </body>
 
