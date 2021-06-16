@@ -209,7 +209,7 @@ class LaporanController extends Controller
                 'bulanLengkap' => $bulanLengkap,
                 'sekolahInfo' => $this->getSekolahi(),
                 'namaKelas' => $request->session()->get('nama_kelas'),
-            ])->setPaper('a4', 'landscape');
+            ])->setPaper('a3', 'landscape');
 
         return $pdf->stream("laporan-tagihan-siswa.pdf");
     }

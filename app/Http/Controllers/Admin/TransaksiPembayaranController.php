@@ -195,7 +195,7 @@ class TransaksiPembayaranController extends Controller
 
             return redirect(route('pembayaran.index'));
         } catch (\Exception $e) {
-            // dd($e->getMessage());
+            dd($e->getMessage());
             session()->flash('error', "Format excel tidak sesuai");
 
             return redirect(route('pembayaran.index'));

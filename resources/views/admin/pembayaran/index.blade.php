@@ -75,7 +75,7 @@
                                             <tr>
                                                 <td style="width: 50px">{{ $loop->iteration }}</td>
                                                 <td>
-                                                    {{ $row->created_at }}
+                                                    {{ date('d M Y H:i', strtotime($row->tanggal_bayar)) }}
                                                 </td>
                                                 <td>
                                                     <a class="" href="{{ route('pembayaran.show', $row->id) }}">

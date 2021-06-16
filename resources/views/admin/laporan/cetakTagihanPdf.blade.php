@@ -212,7 +212,6 @@
                     $totalBayar = 0;
                     $totalSisa = 0;
                     $sisa = 0;
-                    $totalPerBulan = [];
 
                     $totalBulanJanuari = 0;
                     $totalBulanFebruari = 0;
@@ -324,14 +323,18 @@
 
                 @if ($jenisPembayaranTipe === 'bulanan')
                     <tr>
-                        <td colspan="2"></td>
+                        <td colspan="2" style="text-align:center;">
+                            <span style="font-weight: bold">Total</span>
+                        </td>
+
                         @foreach ($bulanLengkap as $index => $item)
                             <td style="text-align:center;">
-                                <small> Total: Rp. {{ number_format(${'totalBulan' . $item}) }}</small>
+                                <small>Dibayar: Rp. {{ number_format(${'totalBulan' . $item}) }}</small>
                                 <br>
                                 <small>Sisa: Rp. {{ number_format(${'sisaBulan' . $item}) }}</small>
                             </td>
                         @endforeach
+
                         <td style="text-align:right;">Rp. {{ number_format($grandTotal) }}
                         </td>
                         <td style="text-align:right;">Rp. {{ number_format($totalSisa) }}

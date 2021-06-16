@@ -100,17 +100,33 @@
                                     {{-- <div class="h4 text-center">Pembayaran</div> --}}
                                     <div class="d-flex justify-content-between">
                                         <address>
-                                            <strong>Data Siswa/i:</strong><br>
-                                            {{ $detail->siswa->nis }}<br>
-                                            {{ $detail->siswa->nama_lengkap }}<br>
-                                            {{ $detail->siswa->kelas->nama_kelas }}<br>
+                                            <strong>Data Siswa/i:</strong>
+                                            <br>
+
+                                            {{ $detail->siswa->nis }}
+                                            <br>
+
+                                            {{ $detail->siswa->nama_lengkap }}
+                                            <br>
+
+                                            {{ $detail->siswa->kelas->nama_kelas }}
+                                            <br>
                                         </address>
+
                                         <address class="text-right">
-                                            <strong>Tanggal Pembayaran:</strong><br>
-                                            {{ $detail->created_at }}<br>
-                                            <strong>Metode Pembayaran:</strong><br>
-                                            {{ $detail->metode_pembayaran }}<br>
-                                            {{ $detail->pembayaran_detail }}<br>
+                                            <strong>Tanggal Pembayaran:</strong>
+                                            <br>
+
+                                            {{ date('d M Y H:i', strtotime($detail->tanggal_bayar)) }}<br>
+
+                                            <strong>Metode Pembayaran:</strong>
+                                            <br>
+
+                                            {{ $detail->metode_pembayaran }}
+                                            <br>
+
+                                            {{ $detail->pembayaran_detail }}
+                                            <br>
                                         </address>
                                     </div>
 

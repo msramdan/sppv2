@@ -5,12 +5,14 @@ namespace App\Imports;
 use App\Models\Siswa;
 use App\Models\Tagihan;
 use App\JenisPembayaran;
-use App\Models\TagihanDetail;
 use App\Models\Tahunajaran;
+use App\Models\TagihanDetail;
 use Illuminate\Support\Collection;
 use App\Models\TransaksiPembayaran;
 use Maatwebsite\Excel\Concerns\ToCollection;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
+use Maatwebsite\Excel\Concerns\WithCustomValueBinder;
+use PhpOffice\PhpSpreadsheet\Shared\Date;
 
 class PembayaranImport implements ToCollection, WithHeadingRow
 {
@@ -29,7 +31,9 @@ class PembayaranImport implements ToCollection, WithHeadingRow
                 'status' => $row['status'],
                 'total' => $row['dibayar'],
                 'users_id' => auth()->id(),
-                'token' => $row['no_va_pmb']
+                'token' => $row['no_va_pmb'],
+                // convert excel timestamp to datetime
+                'tanggal_bayar' =>  Date::excelToDateTimeObject($row['tanggal_bayar'])->format('Y-m-d H:i:s'),
             ]);
 
             $tahun_ajaran = Tahunajaran::where('tahun_ajaran', $row['tahun_ajaran'])->first();
