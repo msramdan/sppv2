@@ -15,7 +15,7 @@ use Gloudemans\Shoppingcart\Facades\Cart;
 
 class TransaksiPembayaranLivewire extends Component
 {
-    public $tagihan_id, $siswa, $selected_siswa, $tagihan, $dibayar, $sisa, $nominal, $nominal_string, $keterangan, $nama_pembayaran, $tahun_ajaran, $selected_tahun, $nama_tahun_ajaran, $error_message, $flash_message, $modal = false, $cart = [];
+    public $tagihan_id, $siswa, $selected_siswa, $tagihan, $dibayar, $sisa, $nominal, $nominal_string, $keterangan, $nama_pembayaran, $tahun_ajaran, $selected_tahun, $nama_tahun_ajaran, $tanggal_bayar, $flash_message, $dibayar_error, $tanggal_bayar_error, $modal = false, $cart = [];
 
     public $search = '';
 
@@ -29,6 +29,10 @@ class TransaksiPembayaranLivewire extends Component
         $this->search = '';
         $this->siswa = '';
         $this->flash_message = '';
+        $this->dibayar = '';
+        $this->tanggal_bayar_error = '';
+        $this->dibayar_error = '';
+        $this->tanggal_bayar = '';
     }
 
     protected $queryString = [
@@ -62,6 +66,9 @@ class TransaksiPembayaranLivewire extends Component
         $this->search = '';
         $this->siswa = '';
         $this->flash_message = '';
+        $this->tanggal_bayar_error = '';
+        $this->dibayar_error = '';
+        $this->tanggal_bayar = '';
 
         Cart::session(auth()->id())->clear();
     }
@@ -84,7 +91,7 @@ class TransaksiPembayaranLivewire extends Component
     public function addToCart()
     {
         if ($this->dibayar == '') {
-            $this->error_message = 'Dibayar tidak boleh kosong!';
+            $this->dibayar_error = 'Dibayar tidak boleh kosong!';
         } else {
             $sisa = $this->sisa - $this->dibayar;
             if ($sisa <= 0) {
@@ -111,7 +118,8 @@ class TransaksiPembayaranLivewire extends Component
     public function showModal($id)
     {
         $this->dibayar = '';
-        $this->error_message = '';
+        $this->tanggal_bayar_error = '';
+        $this->dibayar_error = '';
         $this->modal = true;
 
         $tagihan_detail = TagihanDetail::with('tagihan')->findOrFail($id);
@@ -131,6 +139,10 @@ class TransaksiPembayaranLivewire extends Component
     public function closeModal()
     {
         $this->modal = false;
+        $this->dibayar = '';
+        $this->tanggal_bayar_error = '';
+        $this->dibayar_error = '';
+        // $this->tanggal_bayar = '';
     }
 
     public function saveTransaksi($cart)
@@ -140,70 +152,77 @@ class TransaksiPembayaranLivewire extends Component
             $grand_total += $row['attributes']['dibayar'];
         }
 
-        DB::beginTransaction();
+        if ($this->tanggal_bayar == '') {
+            $this->tanggal_bayar_error = 'Tanggal Bayar tidak boleh kosong!';
+        } else {
+            DB::beginTransaction();
 
-        try {
+            try {
 
-            $kode = 'LKT-' . rand();
-            //menyimpan data ke table
-            $pembayaran = TransaksiPembayaran::create([
-                'siswa_id' => $this->selected_siswa->id,
-                'kode_pembayaran' => $kode,
-                'metode_pembayaran' => 'Loket',
-                'total' => $grand_total,
-                'status' => 'settlement',
-                'users_id' => auth()->id(),
-            ]);
-
-            foreach ($cart as $row) {
-                // dd($row['id']);
-                $tagihanDetail = TagihanDetail::findOrFail($row['id']);
-
-                $totalBayar = $tagihanDetail->total_bayar + $row['attributes']['dibayar'];
-                $sisaBayar = $tagihanDetail->sisa - $row['attributes']['dibayar'];
-
-                $tagihanDetail->sisa = $sisaBayar;
-
-                if ($sisaBayar == 0) {
-                    $tagihanDetail->status = "Lunas";
-                }
-
-                if ($tagihanDetail->total_bayar != 0) {
-                    $total_bayar_detail_pembayaran = $row['attributes']['dibayar'];
-                } else {
-                    $total_bayar_detail_pembayaran = $totalBayar;
-                }
-
-                $tagihanDetail->total_bayar = $totalBayar;
-
-
-                $tagihanDetail->update();
-
-                $tes = $pembayaran->detail_pembayaran()->create([
-                    'nama_pembayaran' => $row['name'],
-                    'keterangan' => $row['attributes']['keterangan'],
-                    'harga' => $row['price'],
-                    'tagihan_details_id' => $row['id'],
-                    'total_bayar' => $total_bayar_detail_pembayaran,
-                    'sisa' => $sisaBayar
+                $kode = 'LKT-' . rand();
+                //menyimpan data ke table
+                $pembayaran = TransaksiPembayaran::create([
+                    'siswa_id' => $this->selected_siswa->id,
+                    'kode_pembayaran' => $kode,
+                    'metode_pembayaran' => 'Loket',
+                    'total' => $grand_total,
+                    'status' => 'settlement',
+                    'users_id' => auth()->id(),
+                    'tanggal_bayar' => $this->tanggal_bayar
                 ]);
+
+                foreach ($cart as $row) {
+                    // dd($row['id']);
+                    $tagihanDetail = TagihanDetail::findOrFail($row['id']);
+
+                    $totalBayar = $tagihanDetail->total_bayar + $row['attributes']['dibayar'];
+                    $sisaBayar = $tagihanDetail->sisa - $row['attributes']['dibayar'];
+
+                    $tagihanDetail->sisa = $sisaBayar;
+
+                    if ($sisaBayar == 0) {
+                        $tagihanDetail->status = "Lunas";
+                    }
+
+                    if ($tagihanDetail->total_bayar != 0) {
+                        $total_bayar_detail_pembayaran = $row['attributes']['dibayar'];
+                    } else {
+                        $total_bayar_detail_pembayaran = $totalBayar;
+                    }
+
+                    $tagihanDetail->total_bayar = $totalBayar;
+
+                    $tagihanDetail->update();
+
+                    $tes = $pembayaran->detail_pembayaran()->create([
+                        'nama_pembayaran' => $row['name'],
+                        'keterangan' => $row['attributes']['keterangan'],
+                        'harga' => $row['price'],
+                        'tagihan_details_id' => $row['id'],
+                        'total_bayar' => $total_bayar_detail_pembayaran,
+                        'sisa' => $sisaBayar
+                    ]);
+                }
+                //apabila tidak terjadi error, penyimpanan diverifikasi
+                DB::commit();
+
+                Cart::session(auth()->id())->clear();
+                $this->selected_siswa = '';
+                $this->tanggal_bayar = '';
+                $this->dibayar_error = '';
+
+                $this->flash_message = "Transaksi Pembayaran Berhasil Disimpan";
+            } catch (\Exception $e) {
+                //jika ada error, maka akan dirollback sehingga tidak ada data yang tersimpan
+                DB::rollback();
+                dd($e->getMessage());
             }
-            //apabila tidak terjadi error, penyimpanan diverifikasi
-            DB::commit();
-
-            Cart::session(auth()->id())->clear();
-            $this->selected_siswa = '';
-
-            $this->flash_message = "Transaksi Pembayaran Berhasil Disimpan";
-        } catch (\Exception $e) {
-            //jika ada error, maka akan dirollback sehingga tidak ada data yang tersimpan
-            DB::rollback();
-            dd($e->getMessage());
         }
     }
 
     public function removeCart($id)
     {
         Cart::session(auth()->id())->remove($id);
+        $this->tanggal_bayar_error = '';
     }
 }

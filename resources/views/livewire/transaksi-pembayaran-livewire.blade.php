@@ -4,7 +4,7 @@
             <div class="input-group mb-2">
                 <div class="input-group-prepend">
                     <div class="input-group-text">
-                        <div wire:loading.remove>
+                        <div wire:loading.remove wire:target="search">
                             <i class="fas fa-search"></i>
                         </div>
 
@@ -356,15 +356,128 @@
                         </table>
 
                         {{-- \Cart::session(Auth()->id())->getContent() as $cart --}}
-                        <div class="py-4 ">
+                        <div class="pt-4">
                             <h6>Total Bayar</h6>
                             <h4>Rp. {{ number_format($sub_dibayar) }}</h4>
                         </div>
 
-                        <button class="btn btn- {{ $sub_dibayar == 0 ? 'btn-dark' : 'btn-primary' }} btn-block"
-                            wire:click="saveTransaksi({{ \Cart::session(Auth()->id())->getContent() }})"
-                            {{ $sub_dibayar == 0 ? 'disabled' : '' }}>Lanjutkan
-                            Pembayaran</button>
+                        <hr>
+
+                        <div class="form-group mb-3">
+                            <label for="tanggal-bayar">Tanggal Bayar</label>
+                            <input wire:model="tanggal_bayar" type="datetime-local" id="tanggal-bayar"
+                                class="form-control{{ $tanggal_bayar_error ? ' is-invalid' : '' }}">
+                            <small class="text-danger mb-0">
+                                {{ $tanggal_bayar_error ? $tanggal_bayar_error : '' }}
+                            </small>
+                        </div>
+
+                        {{-- @if ($tanggal_bayar) --}}
+                        <button wire:click="saveTransaksi({{ \Cart::session(Auth()->id())->getContent() }})"
+                            wire:loading.attr="disabled"
+                            class="btn {{ $sub_dibayar == 0 ? 'btn-dark' : 'btn-primary' }} btn-block mt-0"
+                            {{ $sub_dibayar == 0 ? 'disabled' : '' }}>
+                            <span wire:loading.remove wire:target="saveTransaksi">Lanjutkan Pembayaran</span>
+
+                            <div wire:loading wire:target="saveTransaksi">
+                                <div class="loadingio-spinner-dual-ring-g08fmyqjwnv">
+                                    <div class="ldio-w454krctbo">
+                                        <div></div>
+                                        <div>
+                                            <div></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <style type="text/css">
+                                    @keyframes ldio-w454krctbo {
+                                        0% {
+                                            transform: rotate(0)
+                                        }
+
+                                        100% {
+                                            transform: rotate(360deg)
+                                        }
+                                    }
+
+                                    .ldio-w454krctbo div {
+                                        box-sizing: border-box !important
+                                    }
+
+                                    .ldio-w454krctbo>div {
+                                        position: absolute;
+                                        width: 72px;
+                                        height: 72px;
+                                        top: 14px;
+                                        left: 14px;
+                                        border-radius: 50%;
+                                        border: 8px solid white;
+                                        border-color: #ffffff transparent #ffffff transparent;
+                                        animation: ldio-w454krctbo 1s linear infinite;
+                                    }
+
+                                    .ldio-w454krctbo>div:nth-child(2) {
+                                        border-color: transparent
+                                    }
+
+                                    .ldio-w454krctbo>div:nth-child(2) div {
+                                        position: absolute;
+                                        width: 100%;
+                                        height: 100%;
+                                        transform: rotate(45deg);
+                                    }
+
+                                    .ldio-w454krctbo>div:nth-child(2) div:before,
+                                    .ldio-w454krctbo>div:nth-child(2) div:after {
+                                        content: "";
+                                        display: block;
+                                        position: absolute;
+                                        width: 8px;
+                                        height: 8px;
+                                        top: -8px;
+                                        left: 24px;
+                                        background: #ffffff;
+                                        border-radius: 50%;
+                                        box-shadow: 0 64px 0 0 #ffffff;
+                                    }
+
+                                    .ldio-w454krctbo>div:nth-child(2) div:after {
+                                        left: -8px;
+                                        top: 24px;
+                                        box-shadow: 64px 0 0 0 #ffffff;
+                                    }
+
+                                    .loadingio-spinner-dual-ring-g08fmyqjwnv {
+                                        width: 18px;
+                                        height: 18px;
+                                        display: inline-block;
+                                        overflow: hidden;
+                                        background: none;
+                                    }
+
+                                    .ldio-w454krctbo {
+                                        width: 100%;
+                                        height: 100%;
+                                        position: relative;
+                                        transform: translateZ(0) scale(0.18);
+                                        backface-visibility: hidden;
+                                        transform-origin: 0 0;
+                                        /* see note above */
+                                    }
+
+                                    .ldio-w454krctbo div {
+                                        box-sizing: content-box;
+                                    }
+
+                                    /* generated by https://loading.io/ */
+
+                                </style>
+                            </div>
+                        </button>
+                        {{-- @else
+                            <button class="btn btn-dark btn-block" disabled>Lanjutkan
+                                Pembayaran</button>
+                        @endif --}}
+
 
                     </div>
                 </div>
@@ -406,10 +519,10 @@
                                     <div class="form-group">
                                         <label for="dibayar">Dibayar</label>
                                         <input id="dibayar" type="number"
-                                            class="form-control{{ $error_message ? ' is-invalid' : '' }}" wire:model="dibayar"
+                                            class="form-control{{ $dibayar_error ? ' is-invalid' : '' }}" wire:model="dibayar"
                                             autofocus>
                                         <small class="text-danger">
-                                            {{ $error_message ? $error_message : '' }}
+                                            {{ $dibayar_error ? $dibayar_error : '' }}
                                         </small>
                                     </div>
 
