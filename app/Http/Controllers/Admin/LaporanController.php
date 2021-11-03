@@ -18,6 +18,7 @@ use App\Models\PengaturanSekolah;
 use App\Models\TransaksiPembayaran;
 use App\Http\Controllers\Controller;
 use App\Models\Tahunajaran;
+use Illuminate\Support\Facades\DB;
 
 class LaporanController extends Controller
 {
@@ -155,6 +156,20 @@ class LaporanController extends Controller
 
     public function laporanTagihan(Request $request)
     {
+        // ramdan
+        if ($request->jenisPembayaran==null) {
+            $bulan ='';
+        } else {
+            $jenisPembayaran = $request->jenisPembayaran;
+            $cek = DB::select("select * from jenis_pembayaran where id='$jenisPembayaran'");
+            $hasil = $cek[0]->semester;
+            if ($hasil ==1) {
+                 $bulan = \BulanHelper::getBulanSingkat1();
+            } else {
+                 $bulan = \BulanHelper::getBulanSingkat2();
+            }
+        }
+
         $request->session()->forget(['nama_kelas', 'kelas_id']);
 
         $jenisPembayaranTipe = '';
@@ -181,7 +196,7 @@ class LaporanController extends Controller
         return view('admin.laporan.laporanTagihan', [
             'jenisPembayaran' => JenisPembayaran::all(),
             'kelas' => Kelas::all(),
-            'bulan' => BulanHelper::getBulanSingkat(),
+            'bulan' => $bulan,
             'tagihan' => $tagihan->get()->sortBy('siswa.nama_lengkap'),
             'jenisPembayaranTipe' => $jenisPembayaranTipe,
             'tahun_ajaran' => Tahunajaran::all()
@@ -196,8 +211,17 @@ class LaporanController extends Controller
 
     public function laporanTagihanPdf(Request $request)
     {
-        $bulan = BulanHelper::getBulanSingkat();
-        $bulanLengkap = BulanHelper::getBulan();
+        // ramdan
+        $jenisPembayaran = $request->session()->get('jenisPembayaran');
+        $cek = DB::select("select * from jenis_pembayaran where id='$jenisPembayaran'");
+            $hasil = $cek[0]->semester;
+            if ($hasil ==1) {
+                 $bulan = \BulanHelper::getBulanSingkat1();
+                 $bulanLengkap = \BulanHelper::getBulan2();
+            } else {
+                 $bulan = \BulanHelper::getBulanSingkat2();
+                 $bulanLengkap = \BulanHelper::getBulan2();
+            }
 
         $data = $this->filterTagihan($request);
 
@@ -216,7 +240,16 @@ class LaporanController extends Controller
 
     public function laporanTagihanExcel(Request $request)
     {
-        $bulan = BulanHelper::getBulanSingkat();
+        // ramdan
+        $jenisPembayaran = $request->session()->get('jenisPembayaran');
+        $cek = DB::select("select * from jenis_pembayaran where id='$jenisPembayaran'");
+            $hasil = $cek[0]->semester;
+            if ($hasil ==1) {
+                 $bulan = \BulanHelper::getBulanSingkat1();
+            } else {
+                 $bulan = \BulanHelper::getBulanSingkat2();
+            }
+
 
         $data = $this->filterTagihan($request);
 

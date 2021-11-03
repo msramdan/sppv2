@@ -74,6 +74,20 @@
                                         </div>
 
                                         <div class="form-group">
+                                            <label for="">Semester</label><br>
+                                            <input type="radio" id="satu" value="1" name="semester">
+                                            <label for="satu">Ganjil</label>
+
+                                            <input type="radio" id="dua" value="2" name="semester">
+                                            <label for="dua">Genap</label>
+                                            @error('semester')
+                                                <div class="text-danger small mt-1">{{ $message }}</div>
+                                            @enderror
+                                        </div>
+
+
+
+                                        <div class="form-group">
                                             <label for="tipe">Tipe Pembayaran</label>
                                             <select name="tipe" id="tipe"
                                                 class="form-control @error('tipe') is-invalid @enderror">

@@ -20,12 +20,6 @@
                         <div class="card-header iseng-sticky bg-white">
                             <h4>Laporan Tagihan Siswa/i</h4>
                             <div class="card-header-action">
-                                {{-- <a href="{{ route('kelas.create') }}" class="btn btn-primary btn-icon"
-                                data-toggle="tooltip" data-placement="top" title=""
-                                data-original-title="Tambah Data">
-                                <i class="fas fa-plus-circle px-2"></i>
-                            </a> --}}
-
                             </div>
                         </div>
                         <!-- /.card-header -->
@@ -92,15 +86,6 @@
                                         </div>
                                     </div>
                                 </div>
-
-                                {{-- <div class="row">
-                                    <div class="col-md-4"></div>
-                                    <div class="col-md-4">
-                                        <div class="form-group">
-                                            <button type="submit" class="btn btn-info btn-block">Tampilkan</button>
-                                        </div>
-                                    </div>
-                                </div> --}}
                             </form>
                             <hr>
                             @if (!empty($jenisPembayaranTipe) && $tagihan->count() != 0)
@@ -149,6 +134,7 @@
                                             </tr>
                                         </thead>
                                         <tbody>
+                                            @php $jml_sisa =0; @endphp
                                             @foreach ($tagihan as $row)
                                                 <tr>
                                                     <td>{{ $loop->iteration }}</td>
@@ -173,22 +159,27 @@
 
 
                                                     @foreach ($row->tagihan_detail as $item)
+
                                                         <td style="width: 30px" class="text-center">
                                                             @if ($item->status === 'Lunas')
                                                                 <i class="fas fa-check-circle text-success mt-3"
                                                                     title="{{ $item->status }}"></i>
                                                             @endif
+
                                                             @if ($item->status === 'Belum Lunas')
+
                                                                 <i class="fas fa-times-circle text-danger mt-3"></i>
 
                                                                 <p class="mb-0">Dibayar: Rp.
                                                                     {{ number_format($item->total_bayar) }}</p>
 
                                                                 <p class="mt-0">Sisa: Rp.
-                                                                    {{ number_format($item->sisa) }}</p>
+                                                                    {{ number_format($jml_sisa = $jml_sisa + $item->sisa) }}</p>
                                                             @endif
+
                                                         </td>
                                                     @endforeach
+                                                    @php $jml_sisa =0; @endphp
 
                                                 </tr>
                                             @endforeach

@@ -29,7 +29,7 @@
                                 data-original-title="Edit">
                                 <i class="fas fa-user-edit    "></i>
                             </a>
-                            
+
                         </div>
                     </div>
                     <!-- /.card-header -->
@@ -62,7 +62,7 @@
                                         <a class="nav-link" id="profile-tab2" data-toggle="tab" href="#pembayaran"
                                             role="tab" aria-controls="profile" aria-selected="false">Riwayat Pembayaran</a>
                                     </li>
-                                    
+
                                 </ul>
                                 <div class="tab-content tab-bordered" id="myTab3Content">
                                     <div class="tab-pane fade active show" id="home2" role="tabpanel"
@@ -109,8 +109,8 @@
                                             </div>
                                             <!-- /.col-md -->
                                         </div>
-                                        
-                                        
+
+
                                     </div>
                                     <div class="tab-pane fade" id="profile2" role="tabpanel"
                                         aria-labelledby="profile-tab2">
@@ -124,9 +124,9 @@
                                                         <option value="{{ $item->id  }}"
                                                                 @if ($item->id == old('tahunajaran_id'))
                                                                     selected
-                                                                @endif    
+                                                                @endif
                                                             >
-                                                            
+
                                                             {{ $item->tahun_ajaran }}
                                                         </option>
                                                         @endforeach
@@ -140,22 +140,22 @@
                                             @if ($data->tagihan->count())
                                                 <div class="mb-3">
                                                     <button data-toggle="modal" data-target="#tagihanModal" class="btn btn-primary btn-sm">Tambah Tagihan</button>
-                                                </div>   
+                                                </div>
                                             @endif
-                                            
+
                                             @forelse ($data->tagihan as $row)
                                             <div class="accordion">
                                                 <div class="accordion-header collapsed" role="button" data-toggle="collapse" data-target="#panel-body-{{$row->id}}" aria-expanded="false">
                                                     <div class="d-flex justify-content-between">
                                                         <h4>{{ $row->jenis_pembayaran->nama_pembayaran }}</h4>
                                                         {{-- <h4>
-                                                        
+
                                                             {{ $row->jenis_pembayaran->tipe }}
-                                                            
+
                                                         </h4> --}}
                                                         <h4>{{ $row->jenis_pembayaran->tahunajaran->tahun_ajaran }}</h4>
                                                     </div>
-                                                    
+
                                                 </div>
                                                 <div class="accordion-body collapse" id="panel-body-{{$row->id}}" data-parent="#accordion" style="">
                                                     <div class="table-responsive">
@@ -176,8 +176,8 @@
                                                                         <td>
                                                                             @if ($item->status === "Lunas")
                                                                                 <i class="fas fa-check-circle  text-success mr-2 "></i>
-                                                                            @else 
-                                                                                <i class="fas fa-times-circle text-info  mr-2 "></i>    
+                                                                            @else
+                                                                                <i class="fas fa-times-circle text-info  mr-2 "></i>
                                                                             @endif
                                                                             {{$item->status}}
                                                                         </td>
@@ -185,7 +185,7 @@
                                                                     @endforeach
                                                                 </tbody>
                                                             </table>
-                                                        @else    
+                                                        @else
                                                         <table class="table table-hover">
                                                             <thead>
                                                                 <tr>
@@ -204,8 +204,8 @@
                                                                     <td>
                                                                         @if ($item->status === "Lunas")
                                                                                 <i class="fas fa-check-circle  text-success mr-2  "></i>
-                                                                            @else 
-                                                                                <i class="fas fa-times-circle text-info mr-2  "></i>    
+                                                                            @else
+                                                                                <i class="fas fa-times-circle text-info mr-2  "></i>
                                                                             @endif
                                                                         {{$item->status}}
                                                                     </td>
@@ -244,7 +244,7 @@
                                                     @foreach ($pembayaran as $item)
                                                     <tr>
                                                         <td>
-                                                            
+
                                                             {{$item->created_at}}
                                                         </td>
                                                         <td>{{$item->nama_pembayaran}}</td>
@@ -252,7 +252,7 @@
                                                         <td class="text-right">Rp.{{number_format($item->harga)}}</td>
                                                         <td class="text-center">{{$item->transaksi_pembayaran->metode_pembayaran}}</td>
                                                     </tr>
-                                                        
+
                                                     @endforeach
                                                 </tbody>
                                             </table>
@@ -331,33 +331,36 @@
                                 $s = true;
                                 $totalCheck++;
                             @endphp
-                        @endif 
+                        @endif
                     @endforeach
                         <div class="custom-control custom-checkbox py-1">
                             <input type="checkbox" class="custom-control-input" name="jenisPembayaran_id[]" id="item{{$item->id}}" value="{{$item->id}}" {{($s) ? 'checked disabled' : ''}} >
+
                             <label class="custom-control-label d-flex justify-content-between {{($s) ? 'text-muted' : ''}}" for="item{{$item->id}}">
                                 <span>
-                                    <strong>{{$item->nama_pembayaran}}</strong> 
+                                    <strong>{{$item->nama_pembayaran}}</strong>
                                     <span class="text-right">
                                         @if ($item->tipe === "bulanan")
                                             <span class="">(Setiap Bulan)</span>
-                                        @else 
+                                        @else
                                             <span class="">(Angsuran/Bebas)</span>
                                         @endif
                                     </span>
                                     <br>
                                 <span class="small">TP.{{$item->tahunajaran->tahun_ajaran}}</span>
+                                <span class="small">Semester.{{$item->semester}}</span>
                                 </span>
                                 <span>{{number_format($item->harga)}}</span>
                             </label>
                         </div>
-                
+
+
                 @endforeach
             </div>
             <div class="modal-footer">
-                
+
                     {{-- @method('DELETE') --}}
-                    
+
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
                     <button type="submit" class="btn btn-primary" {{($jenisPembayaran->count() == $totalCheck) ? 'disabled' : ''}}>Simpan</button>
                 </form>

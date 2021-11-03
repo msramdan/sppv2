@@ -94,9 +94,9 @@
                                         <option value="{{ $item->id  }}"
                                                 @if ($item->id == old('kelas_id'))
                                                     selected
-                                                @endif    
+                                                @endif
                                             >
-                                            
+
                                             {{ $item->nama_kelas }}
                                         </option>
                                         @endforeach
@@ -159,7 +159,7 @@
                         </div>
                         <div class="row">
                             <div class="col-12">
-                                
+
 
                             </div>
                         </div>
@@ -181,7 +181,7 @@
 
 @section('scripts')
 <script>
-    
+
         $(document).ready(function () {
             $('#kelas_id').select2()
 

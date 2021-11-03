@@ -24,6 +24,7 @@ class PembayaranImport implements ToCollection, WithHeadingRow
         foreach ($rows as $row) {
             $siswa = Siswa::where('nama_lengkap', $row['nama_siswa'])->first();
 
+            //input ke table transaksi pembayaran
             $pembayaran = TransaksiPembayaran::create([
                 'kode_pembayaran' => 'LKT-' . rand(),
                 'siswa_id' => $siswa->id,
@@ -32,8 +33,7 @@ class PembayaranImport implements ToCollection, WithHeadingRow
                 'total' => $row['dibayar'],
                 'users_id' => auth()->id(),
                 'token' => $row['no_va_pmb'],
-                // convert excel timestamp to datetime
-                'tanggal_bayar' =>  Date::excelToDateTimeObject($row['tanggal_bayar'])->format('Y-m-d H:i:s'),
+                'tanggal_bayar' =>  Date::excelToDateTimeObject($row['tanggal_bayar'])->format('Y-m-d H:i:s'), // convert excel timestamp to datetime
             ]);
 
             $tahun_ajaran = Tahunajaran::where('tahun_ajaran', $row['tahun_ajaran'])->first();
@@ -67,8 +67,10 @@ class PembayaranImport implements ToCollection, WithHeadingRow
 
             $detail_tagihan->total_bayar = $totalBayar;
 
+            //update detail tagihan
             $detail_tagihan->update();
 
+            //input detail pembayaran
             $pembayaran->detail_pembayaran()->create([
                 'nama_pembayaran' => $row['nama_pembayaran'],
                 'keterangan' => $row['keterangan'],

@@ -239,7 +239,7 @@
                     $sisaBulanNovember = 0;
                     $sisaBulanDesember = 0;
                 @endphp
-
+                @php $jml_sisa =0; @endphp
                 @foreach ($data as $row)
                     <tr>
                         <td width="10px">{{ $loop->iteration }}</td>
@@ -279,7 +279,7 @@
                                         Rp. {{ number_format($item->total_bayar) }}</small>
                                     <br>
                                     <small style="margin-top: 0">Sisa:
-                                        Rp. {{ number_format($item->sisa) }}</small>
+                                        Rp. {{ number_format($jml_sisa = $jml_sisa + $item->sisa) }}</small>
                                     @php
                                         $sisa += $item->sisa;
                                         $total += $item->total_bayar;
@@ -287,6 +287,7 @@
                                 @endif
                             </td>
                         @endforeach
+                        @php $jml_sisa =0; @endphp
                         {{-- <td>Total BLN:</td> --}}
 
                         @if ($jenisPembayaranTipe !== 'bulanan')

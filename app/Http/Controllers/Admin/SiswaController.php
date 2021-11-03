@@ -21,6 +21,7 @@ use Illuminate\Support\Facades\File;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Http\Requests\Siswa\StoreSiswaRequest;
 use App\Http\Requests\Siswa\UpdateSiswaRequest;
+use Illuminate\Support\Facades\DB;
 
 class SiswaController extends Controller
 {
@@ -257,10 +258,17 @@ class SiswaController extends Controller
             'jenisPembayaran_id' => 'required',
         ]);
 
-        $bulan = \BulanHelper::getBulan();
-        // $tagihan = $request->jenisPembayaran_id;
-
         foreach ($request->jenisPembayaran_id as $item) {
+            // ramdan
+            $cek = DB::select("select * from jenis_pembayaran where id='$item'");
+            $hasil = $cek[0]->semester;
+            if ($hasil ==1) {
+                 $bulan = \BulanHelper::getBulan1();
+            } else {
+                 $bulan = \BulanHelper::getBulan2();
+            }
+
+
             $jenisPembayaran = JenisPembayaran::find($item);
 
             $tagihan = Tagihan::create([
@@ -269,6 +277,7 @@ class SiswaController extends Controller
             ]);
 
             if ($jenisPembayaran->tipe === "bulanan") {
+
                 foreach ($bulan as $b) {
                     TagihanDetail::create([
                         'tagihan_id' => $tagihan->id,

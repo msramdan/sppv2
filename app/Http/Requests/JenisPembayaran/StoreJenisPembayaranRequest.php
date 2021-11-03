@@ -28,6 +28,7 @@ class StoreJenisPembayaranRequest extends FormRequest
             'tahunajaran_id' => 'required|exists:tahunajaran,id',
             'harga' => 'required|integer|min:1',
             'tipe' => 'required|max:100',
+            'semester' => 'required',
             // 'kelas_id' => 'required',
         ];
     }

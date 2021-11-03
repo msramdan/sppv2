@@ -156,6 +156,20 @@
                     <form action="{{ route('pembayaran.import') }}" method="POST" enctype="multipart/form-data">
                         @csrf
                         <div class="form-group">
+                            <label for="import_pembayaran">Pilih Jenis Pembayaran</label>
+                            <select name="kelas_id" id="kelas_id" class="form-control @error('kelas_id') is-invalid @enderror">
+                                        <option value="">-Pilih-</option>
+                                        <option value="">SPP</option>
+                                        <option value="">KBM</option>
+                                        <option value="">Lainnya</option>
+                                    </select>
+
+                            @error('import_pembayaran')
+                                <div class="text-danger small mt-1">{{ $message }}</div>
+                            @enderror
+                        </div>
+
+                        <div class="form-group">
                             <label for="import_pembayaran">Import File</label>
                             <input type="file" class="form-control-file" name="import_pembayaran" id="import_pembayaran"
                                 placeholder="" aria-describedby="fileHelpId" required>

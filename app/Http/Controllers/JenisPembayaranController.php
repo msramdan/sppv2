@@ -208,7 +208,11 @@ class JenisPembayaranController extends Controller
 
     public function createOrUpdateBatchTagihan($siswa, $request, $jenis_pembayaran, $pembayaran_untuk)
     {
-        $bulan = BulanHelper::getBulan();
+        if ($request->semester ==1) {
+            $bulan = BulanHelper::getBulan1();
+        } else {
+            $bulan = BulanHelper::getBulan2();
+        }
 
         if ($jenis_pembayaran == 'new') {
             $jenis_pembayaran = JenisPembayaran::create([
@@ -216,6 +220,7 @@ class JenisPembayaranController extends Controller
                 'tahunajaran_id' => $request->tahunajaran_id,
                 'tipe' => $request->tipe,
                 'harga' => $request->harga,
+                'semester' => $request->semester,
                 // array to string
                 'pembayaran_untuk' => json_encode($pembayaran_untuk),
             ]);
@@ -227,6 +232,7 @@ class JenisPembayaranController extends Controller
          * cek sudah ada tagihan atau belum
          * jika belum maka set $latest_tagihan_id ke 1
          */
+
         $latest_tagihan_id = Tagihan::orderByDesc('id')->pluck('id')->first();
         $latest_tagihan_id ? $latest_tagihan_id : $latest_tagihan_id = 0;
 

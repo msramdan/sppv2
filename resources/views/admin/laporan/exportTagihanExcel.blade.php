@@ -85,7 +85,7 @@
                     $totalSisa = 0;
                     $sisa = 0;
                 @endphp
-
+                 @php $jml_sisa =0; @endphp
                 @forelse ($data as $row)
                     <tr>
                         <td style="text-align:center; border: 1px solid black">{{ $loop->iteration }}</td>
@@ -118,7 +118,7 @@
                                         Rp. {{ number_format($item->total_bayar) }}</small>
                                     <br>
                                     <small style="margin-top: 0">Sisa: Rp.
-                                        Rp. {{ number_format($item->sisa) }}</small>
+                                        Rp. {{ number_format($jml_sisa = $jml_sisa + $item->sisa) }}</small>
                                     @php
                                         $sisa += $item->sisa;
                                         $total += $item->total_bayar;
@@ -127,6 +127,7 @@
 
                             </td>
                         @endforeach
+                        @php $jml_sisa =0; @endphp
 
                         @if ($jenisPembayaranTipe !== 'bulanan')
                             <td style="text-align:right; border: 1px solid black">
@@ -172,7 +173,7 @@
 
                 @if ($jenisPembayaranTipe === 'bulanan')
                     <tr>
-                        <td colspan="15" style="text-align:right; border: 1px solid black;"></td>
+                        <td colspan="9" style="text-align:right; border: 1px solid black;"></td>
 
                         <td colspan="1" style="text-align:right; border: 1px solid black;">Grand Total </td>
 

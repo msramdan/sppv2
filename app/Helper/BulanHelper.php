@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace App\Helper;
 
@@ -6,7 +6,8 @@ use App\Setting;
 
 class BulanHelper
 {
-    public static function getBulan()
+
+    public static function getBulan1()
     {
         $bulan = [
             'Juli',
@@ -15,6 +16,13 @@ class BulanHelper
             'Oktober',
             'November',
             'Desember',
+        ];
+        return $bulan;
+    }
+
+    public static function getBulan2()
+    {
+        $bulan = [
             'Januari',
             'Februari',
             'Maret',
@@ -25,7 +33,7 @@ class BulanHelper
         return $bulan;
     }
 
-    public static function getBulanSingkat()
+    public static function getBulanSingkat1()
     {
         $bulan = [
             'Jul',
@@ -34,6 +42,14 @@ class BulanHelper
             'Okt',
             'Nov',
             'Des',
+        ];
+        return $bulan;
+    }
+
+
+    public static function getBulanSingkat2()
+    {
+        $bulan = [
             'Jan',
             'Feb',
             'Mar',
