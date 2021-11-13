@@ -154,6 +154,20 @@
                                         <div class="text-danger small mt-1">{{ $message }}</div>
                                     @enderror
                                 </div>
+                                <div class="form-group">
+                                    <label for="no_va_spp">No VA SPP</label>
+                                    <input type="number" class="form-control @error('no_va_spp') is-invalid @enderror" name="no_va_spp" id="no_va_spp" value="{{ old('no_telp_orangtua') }}"  placeholder="No VA SPP">
+                                    @error('no_va_spp')
+                                        <div class="text-danger small mt-1">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                                <div class="form-group">
+                                    <label for="no_va_other">No VA Other</label>
+                                    <input type="number" class="form-control @error('no_va_other') is-invalid @enderror" name="no_va_other" id="no_va_other" value="{{ old('no_telp_orangtua') }}"  placeholder="No VA Other">
+                                    @error('no_va_other')
+                                        <div class="text-danger small mt-1">{{ $message }}</div>
+                                    @enderror
+                                </div>
 
                             </div>
                         </div>

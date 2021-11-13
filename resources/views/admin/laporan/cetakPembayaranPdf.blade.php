@@ -23,12 +23,12 @@
         table td{
             text-align: left;
         }
-        
+
         table.layout{
             width: 100%;
             border-collapse: collapse;
         }
-        
+
         table.display{
             margin: 1em 0;
         }
@@ -40,7 +40,7 @@
 
         table.display th{ background: #D5E0CC; }
         table.display td{ background: #fff; }
-        
+
         /* table.responsive-table{
             box-shadow: 0 1px 10px rgba(0, 0, 0, 0.2);
         }  */
@@ -65,7 +65,7 @@
             width: 120px;
             height: 120px;
             /* position: absolute; */
-            
+
         }
 
         .judul{
@@ -98,7 +98,7 @@
         .sub-header{
             font-size: 20px;
         }
-        
+
     </style>
 </head>
 <body>
@@ -118,13 +118,13 @@
             </div>
             <div class="garis"></div>
         </div>
-        
+
         {{-- <h5>Dicetak Tanggal : {{ date("d-m-Y") }}</h5> --}}
         {{-- <br> --}}
-        
+
         {{-- <p><small style="opacity: 0.5;">{{ $penjualan->created_at->format('d-m-Y H:i:s') }}</small></p> --}}
     </div>
-    
+
     <div class="info">
         {{-- @if (!empty($start_date))
             <table>
@@ -136,7 +136,7 @@
                     <td>Sampai Tanggal</td>
                     <td>: {{ date_format(date_create($end_date), "d/m/Y") }}</td>
                 </tr>
-            </table>    
+            </table>
         @endif --}}
         <strong>Laporan Transaksi Pembayaran </strong> <br>
         <table style="margin-left: auto; margin-right: auto">
@@ -166,11 +166,11 @@
                 <td>{{ ($namaKelas == "") ? 'Semua Kelas' : $namaKelas }}</td>
             </tr> --}}
         </table>
-        
+
     </div>
     <div class="page">
         @if ($mode === 'simple')
-            
+
         <table class="layout display responsive-table" style="font-size: 18px">
             <thead>
                 <tr >
@@ -204,7 +204,7 @@
                         <td style=" text-align: right">
                             Rp.{{ number_format($row->harga) }}
                         </td>
-                    </tr>  
+                    </tr>
                 @empty
                 <tr>
                     <td colspan="5" class="text-center">Tidak ada data</td>
@@ -217,7 +217,7 @@
             </tbody>
         </table>
 
-        @else 
+        @else
 
         @foreach ($data as $row)
             <table class="layout display responsive-table" style="font-size: 18px">
@@ -251,13 +251,13 @@
                         <td style="text-align: right">
                             Rp.{{ number_format($item->harga) }}
                         </td>
-                    </tr>                                  
-                        
+                    </tr>
+
                     @endforeach
-                    
+
                 </tbody>
             </table>
-            
+
         @endforeach
         <div style="font-size: 20px; text-align: right; margin-top: -10px">
             <span>Total : Rp.{{number_format($total)}}</span>

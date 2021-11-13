@@ -156,15 +156,13 @@
                     <form action="{{ route('pembayaran.import') }}" method="POST" enctype="multipart/form-data">
                         @csrf
                         <div class="form-group">
-                            <label for="import_pembayaran">Pilih Jenis Pembayaran</label>
-                            <select name="kelas_id" id="kelas_id" class="form-control @error('kelas_id') is-invalid @enderror">
+                            <label for="jenis">Pilih Jenis Pembayaran</label>
+                            <select name="jenis" id="jenis" required class="form-control @error('jenis') is-invalid @enderror">
                                         <option value="">-Pilih-</option>
-                                        <option value="">SPP</option>
-                                        <option value="">KBM</option>
-                                        <option value="">Lainnya</option>
+                                        <option value="bulanan">SPP (Bulanan)</option>
+                                        <option value="bebas">KBM (Angsuran/Bebas)</option>
                                     </select>
-
-                            @error('import_pembayaran')
+                            @error('jenis')
                                 <div class="text-danger small mt-1">{{ $message }}</div>
                             @enderror
                         </div>

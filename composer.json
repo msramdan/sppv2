@@ -21,6 +21,7 @@
         "livewire/livewire": "^2.4",
         "maatwebsite/excel": "^3.1",
         "midtrans/midtrans-php": "^2.3",
+        "realrashid/sweet-alert": "^4.0",
         "spatie/laravel-backup": "^6.11",
         "spatie/laravel-permission": "^3.15"
     },

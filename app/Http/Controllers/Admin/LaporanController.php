@@ -217,7 +217,7 @@ class LaporanController extends Controller
             $hasil = $cek[0]->semester;
             if ($hasil ==1) {
                  $bulan = \BulanHelper::getBulanSingkat1();
-                 $bulanLengkap = \BulanHelper::getBulan2();
+                 $bulanLengkap = \BulanHelper::getBulan1();
             } else {
                  $bulan = \BulanHelper::getBulanSingkat2();
                  $bulanLengkap = \BulanHelper::getBulan2();

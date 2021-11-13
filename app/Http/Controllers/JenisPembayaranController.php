@@ -65,6 +65,8 @@ class JenisPembayaranController extends Controller
             return redirect()->back()->with('error', '"Pembayaran untuk" tidak boleh kosong!, harap pilih salah satu.');
         }
 
+        // dd($request->has('semua_siswa_kelas'));
+
         // string
         if ($request->has('semua_kelas')) {
             $semua_kelas = Kelas::pluck('id')->all();

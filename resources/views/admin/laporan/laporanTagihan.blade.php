@@ -134,7 +134,6 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            @php $jml_sisa =0; @endphp
                                             @foreach ($tagihan as $row)
                                                 <tr>
                                                     <td>{{ $loop->iteration }}</td>
@@ -174,12 +173,10 @@
                                                                     {{ number_format($item->total_bayar) }}</p>
 
                                                                 <p class="mt-0">Sisa: Rp.
-                                                                    {{ number_format($jml_sisa = $jml_sisa + $item->sisa) }}</p>
+                                                                    {{ number_format($item->sisa) }}</p>
                                                             @endif
-
                                                         </td>
                                                     @endforeach
-                                                    @php $jml_sisa =0; @endphp
 
                                                 </tr>
                                             @endforeach

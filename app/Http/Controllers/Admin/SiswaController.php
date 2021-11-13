@@ -22,6 +22,7 @@ use Maatwebsite\Excel\Facades\Excel;
 use App\Http\Requests\Siswa\StoreSiswaRequest;
 use App\Http\Requests\Siswa\UpdateSiswaRequest;
 use Illuminate\Support\Facades\DB;
+use RealRashid\SweetAlert\Facades\Alert;
 
 class SiswaController extends Controller
 {
@@ -115,6 +116,8 @@ class SiswaController extends Controller
             'nama_ibu_kandung' => $request->nama_ibu_kandung,
             'nama_ayah_kandung' => $request->nama_ayah_kandung,
             'no_telp_orangtua' => $request->no_telp_orangtua,
+            'no_va_spp' => $request->no_va_spp,
+            'no_va_other' => $request->no_va_other,
             'status' => 'Aktif',
             'kelas_id' => $request->kelas_id,
             'user_id' => $user->id,
@@ -136,7 +139,6 @@ class SiswaController extends Controller
     {
         $data = Siswa::with('kelas', 'tagihan')->findOrFail($id);
         $jenisPembayaran = JenisPembayaran::all();
-        // $jp = [];
 
         $this->siswaId = $id;
         $tahun_ajaran = Tahunajaran::all();
@@ -181,6 +183,8 @@ class SiswaController extends Controller
             'nama_ibu_kandung',
             'nama_ayah_kandung',
             'no_telp_orangtua',
+            'no_va_spp',
+            'no_va_other',
             'status',
             'kelas_id',
         ]);
@@ -257,50 +261,68 @@ class SiswaController extends Controller
         $this->validate($request, [
             'jenisPembayaran_id' => 'required',
         ]);
+        $gagal_add_tagihan = [];
 
         foreach ($request->jenisPembayaran_id as $item) {
             // ramdan
             $cek = DB::select("select * from jenis_pembayaran where id='$item'");
-            $hasil = $cek[0]->semester;
-            if ($hasil ==1) {
-                 $bulan = \BulanHelper::getBulan1();
-            } else {
-                 $bulan = \BulanHelper::getBulan2();
-            }
-
-
+            $nama_pembayaran =$cek[0]->nama_pembayaran;
+            $tipe =$cek[0]->tipe;
+            $tahun_ajaran =$cek[0]->tahunajaran_id;
+            $semester = $cek[0]->semester;
             $jenisPembayaran = JenisPembayaran::find($item);
-
-            $tagihan = Tagihan::create([
-                'siswa_id' => $request->siswaId,
-                'jenis_pembayaran_id' => $jenisPembayaran->id,
-            ]);
-
-            if ($jenisPembayaran->tipe === "bulanan") {
-
-                foreach ($bulan as $b) {
+            //tagihan Join dengan jenis Pembayaran
+            $cek_tagihan = DB::select("select tagihan.siswa_id,jenis_pembayaran.tahunajaran_id,jenis_pembayaran.tipe,jenis_pembayaran.semester  from tagihan join jenis_pembayaran on tagihan.jenis_pembayaran_id=jenis_pembayaran.id where siswa_id='$request->siswaId' and tipe='$tipe' and tahunajaran_id='$tahun_ajaran' and semester ='$semester'");
+            if($cek_tagihan==null || $cek_tagihan==''){
+                // create tagihan
+                $tagihan = Tagihan::create([
+                    'siswa_id' => $request->siswaId,
+                    'jenis_pembayaran_id' => $jenisPembayaran->id,
+                ]);
+                // ambil data bulan
+                if ($semester ==1) {
+                 $bulan = \BulanHelper::getBulan1();
+                    } else {
+                        $bulan = \BulanHelper::getBulan2();
+                    }
+                // Create detail tagihan
+                if ($jenisPembayaran->tipe === "bulanan") {
+                    foreach ($bulan as $b) {
+                        TagihanDetail::create([
+                            'tagihan_id' => $tagihan->id,
+                            'status' => 'Belum Lunas',
+                            'keterangan' => $b,
+                            'total_bayar' => 0,
+                            'sisa' => $jenisPembayaran->harga,
+                        ]);
+                    }
+                } else {
                     TagihanDetail::create([
                         'tagihan_id' => $tagihan->id,
                         'status' => 'Belum Lunas',
-                        'keterangan' => $b,
+                        'keterangan' => 'Bebas',
                         'total_bayar' => 0,
                         'sisa' => $jenisPembayaran->harga,
                     ]);
                 }
-            } else {
-                TagihanDetail::create([
-                    'tagihan_id' => $tagihan->id,
-                    'status' => 'Belum Lunas',
-                    'keterangan' => 'Bebas',
-                    'total_bayar' => 0,
-                    'sisa' => $jenisPembayaran->harga,
-                ]);
+
+            }else{
+                //buat array data yg gagal add
+                array_push($gagal_add_tagihan,$nama_pembayaran);
+            }
+
+            $hitung = count($gagal_add_tagihan);
+            if ($hitung <= 0){
+                session()->flash('success', "Tagihan Berhasil Ditambahkan");
+            }else{
+                $gagal_tambah ="<ul style='list-style-type: none;margin: 0;padding: 0;' ><li>" . implode("</li><li>", $gagal_add_tagihan) . "</li></ul>";
+                Alert::html('', '<b>'.'Gagal Tambah tagihan'.'</b><font style="font-size:12px">'.$gagal_tambah. '</font>','info')->persistent('Dismiss');
             }
         }
-        session()->flash('success', "Tagihan Berhasil Ditambahkan");
-
         return redirect()->back();
     }
+
+
 
     public function deleteTagihan($id)
     {

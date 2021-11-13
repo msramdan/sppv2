@@ -31,7 +31,7 @@
     <link rel="stylesheet" href="{{ asset('/themes/stisla/assets/css/style.css') }}">
     <link rel="stylesheet" href="{{ asset('/themes/stisla/assets/css/components.css') }}">
 
-    
+
     <style>
         .iseng-sticky {
           /* position: -webkit-sticky; */
@@ -94,11 +94,11 @@
                         <input class="form-control" type="search" placeholder="Search" aria-label="Search"
                             data-width="250" style="width: 250px;">
                         <button class="btn" type="submit"><i class="fas fa-search"></i></button>
-                        
+
                     </div> --}}
                 </form>
                 <ul class="navbar-nav navbar-right">
-                    
+
                     <li class="dropdown"><a href="#" data-toggle="dropdown"
                             class="nav-link dropdown-toggle nav-link-lg nav-link-user">
                             <img width="30" height="30" alt="image" src="{{ asset('/img/').'/'.Auth::user()->foto }}" class="rounded-circle mr-1 shadow">
@@ -148,7 +148,7 @@
             </footer>
         </div>
     </div>
-    
+
     <!-- js -->
     {{-- <script src="{{ asset('/js/app.js') }}"></script> --}}
     <!-- General JS Scripts -->
@@ -169,6 +169,7 @@
     <!-- JS Libraies -->
 
     <!-- Template JS File -->
+    @include('sweetalert::alert')
     <script src="{{ asset('themes/stisla/assets/js/scripts.js') }}"></script>
     <script src="{{ asset('themes/stisla/assets/js/custom.js') }}"></script>
 

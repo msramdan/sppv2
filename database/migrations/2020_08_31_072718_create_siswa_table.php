@@ -25,6 +25,8 @@ class CreateSiswaTable extends Migration
             $table->string('nama_ibu_kandung');
             $table->string('nama_ayah_kandung');
             $table->string('no_telp_orangtua');
+            $table->string('no_va_spp')->nullable();
+            $table->string('no_va_other')->nullable();
             $table->string('status');
             $table->string('foto');
             $table->foreignId('kelas_id')->constrained('kelas')->default('1');

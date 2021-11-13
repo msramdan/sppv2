@@ -96,9 +96,9 @@
                                         <option value="{{ $item->id  }}"
                                                 @if ($item->id == $siswa->kelas_id)
                                                     selected
-                                                @endif    
+                                                @endif
                                             >
-                                            
+
                                             {{ $item->nama_kelas }}
                                         </option>
                                         @endforeach
@@ -131,7 +131,7 @@
                                         <option value="Dikeluarkan" {{ ('Dikeluarkan' === $siswa->status) ? 'selected' : '' }}>
                                             Dikeluarkan
                                         </option>
-                                        
+
                                     </select>
                                     @error('status')
                                         <div class="text-danger small mt-1">{{ $message }}</div>
@@ -139,8 +139,8 @@
                                 </div>
 
 
-                                
-                                
+
+
                             </div>
                             <!-- /.col-md -->
                             <div class="col-md-4">
@@ -169,6 +169,23 @@
                                 </div>
 
                                 <div class="form-group">
+                                    <label for="no_va_spp">No VA SPP</label>
+                                    <input type="number" class="form-control @error('no_va_spp') is-invalid @enderror" name="no_va_spp" id="no_va_spp" value="{{ $siswa->no_va_spp }}"  placeholder="No VA SPP">
+                                    @error('no_va_spp')
+                                        <div class="text-danger small mt-1">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                                <div class="form-group">
+                                    <label for="no_va_other">No VA Other</label>
+                                    <input type="number" class="form-control @error('no_va_other') is-invalid @enderror" name="no_va_other" id="no_va_other" value="{{ $siswa->no_va_other }}"  placeholder="No VA Other">
+                                    @error('no_va_other')
+                                        <div class="text-danger small mt-1">{{ $message }}</div>
+                                    @enderror
+                                </div>
+
+
+
+                                <div class="form-group">
                                     <label for="alamat">Alamat</label>
                                     <textarea class="form-control @error('alamat') is-invalid @enderror" name="alamat" id="alamat"  data-height="100">{{ $siswa->alamat }}</textarea>
                                     @error('alamat')
@@ -186,7 +203,7 @@
                         </div>
                         <div class="row">
                             <div class="col-12">
-                                
+
 
                             </div>
                         </div>
@@ -208,7 +225,7 @@
 
 @section('scripts')
 <script>
-    
+
         $(document).ready(function () {
             $('#kelas_id').select2()
 

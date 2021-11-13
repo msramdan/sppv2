@@ -101,6 +101,12 @@
                                                 <strong>Nama Ayah Kandung</strong><br>
                                                 {{ $data->nama_ayah_kandung }}
                                                 <br><br>
+                                                <strong>No VA SPP</strong><br>
+                                                {{ $data->no_va_spp }}
+                                                <br><br>
+                                                <strong>No VA Other</strong><br>
+                                                {{ $data->no_va_other }}
+                                                <br><br>
                                                 <strong>No. Telp Orangtua</strong><br>
                                                 {{ $data->no_telp_orangtua }}
                                                 <br><br>

@@ -189,15 +189,12 @@ class TransaksiPembayaranController extends Controller
         ]);
 
         try {
-            Excel::import(new PembayaranImport, $request->file('import_pembayaran'));
-
-            session()->flash('success', "Data Pembayaran berhasil di import");
-
+            $jenis = $request->jenis;
+            Excel::import(new PembayaranImport($jenis), $request->file('import_pembayaran'), $jenis);
             return redirect(route('pembayaran.index'));
         } catch (\Exception $e) {
             dd($e->getMessage());
             session()->flash('error', "Format excel tidak sesuai");
-
             return redirect(route('pembayaran.index'));
         }
     }

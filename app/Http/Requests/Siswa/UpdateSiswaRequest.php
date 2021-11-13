@@ -28,7 +28,7 @@ class UpdateSiswaRequest extends FormRequest
             'nis' => 'required|string|max:50|unique:siswa,nis,'.$id,
             'nama_lengkap' => 'required|string|max:100',
             'jenis_kelamin' => 'required',
-            'tempat_lahir' => 'required', 
+            'tempat_lahir' => 'required',
             'tanggal_lahir' => 'required|date',
             'no_telp' => 'required',
             'alamat' => 'required',
@@ -36,7 +36,9 @@ class UpdateSiswaRequest extends FormRequest
             'nama_ayah_kandung' => 'required',
             'no_telp_orangtua' => 'required',
             'kelas_id' => 'required',
-            'foto' => 'nullable|image|mimes:jpg,png,jpeg|max:2000'
+            'foto' => 'nullable|image|mimes:jpg,png,jpeg|max:2000',
+            'no_va_spp' =>'nullable',
+            'no_va_other'=>'nullable'
         ];
     }
 }
