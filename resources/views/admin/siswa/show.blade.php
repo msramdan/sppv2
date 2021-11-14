@@ -255,7 +255,7 @@
                                                         </td>
                                                         <td>{{$item->nama_pembayaran}}</td>
                                                         <td>{{$item->keterangan}}</td>
-                                                        <td class="text-right">Rp.{{number_format($item->harga)}}</td>
+                                                        <td class="text-right">Rp.{{number_format($item->total_bayar)}}</td>
                                                         <td class="text-center">{{$item->transaksi_pembayaran->metode_pembayaran}}</td>
                                                     </tr>
 

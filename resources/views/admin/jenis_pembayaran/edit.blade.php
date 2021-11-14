@@ -18,6 +18,19 @@
 
             <div class="row">
                 <div class="col-12">
+                    @if (session()->has('error'))
+                        <div class="alert alert-danger alert-has-icon mb-4 alert-dismissible show fade">
+                            <button class="close" data-dismiss="alert">
+                                <span>&times;</span>
+                            </button>
+                            <div class="alert-icon"><i class="far fa-lightbulb"></i></div>
+                            <div class="alert-body">
+                                <div class="alert-title">Error</div>
+                                {{ session()->get('error') }}
+                            </div>
+                        </div>
+                    @endif
+
                     <div class="card">
                         <div class="card-header iseng-sticky bg-white">
                             <a href="{{ route('jenispembayaran.index') }}" class="btn">

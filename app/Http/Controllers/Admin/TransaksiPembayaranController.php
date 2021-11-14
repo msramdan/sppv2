@@ -189,8 +189,7 @@ class TransaksiPembayaranController extends Controller
         ]);
 
         try {
-            $jenis = $request->jenis;
-            Excel::import(new PembayaranImport($jenis), $request->file('import_pembayaran'), $jenis);
+            Excel::import(new PembayaranImport, $request->file('import_pembayaran'));
             return redirect(route('pembayaran.index'));
         } catch (\Exception $e) {
             dd($e->getMessage());

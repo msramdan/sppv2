@@ -37,8 +37,8 @@ class UpdateSiswaRequest extends FormRequest
             'no_telp_orangtua' => 'required',
             'kelas_id' => 'required',
             'foto' => 'nullable|image|mimes:jpg,png,jpeg|max:2000',
-            'no_va_spp' =>'nullable',
-            'no_va_other'=>'nullable'
+            'no_va_spp' =>'nullable|unique:siswa,no_va_spp,' .$id,
+            'no_va_other'=>'nullable|unique:siswa,no_va_other,' .$id
         ];
     }
 }

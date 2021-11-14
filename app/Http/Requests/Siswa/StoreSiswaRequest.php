@@ -36,8 +36,8 @@ class StoreSiswaRequest extends FormRequest
             'nama_ayah_kandung' => 'required',
             'no_telp_orangtua' => 'required',
             'foto_siswa' => 'nullable|image|mimes:jpg,png,jpeg|max:2000',
-            'no_va_spp' =>'nullable',
-            'no_va_other'=>'nullable'
+            'no_va_spp' =>'nullable|unique:siswa,no_va_spp',
+            'no_va_other'=>'nullable|unique:siswa,no_va_other'
         ];
     }
 }

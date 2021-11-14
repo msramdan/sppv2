@@ -306,6 +306,21 @@ class SiswaController extends Controller
                     ]);
                 }
 
+            }elseif($cek_tagihan[0]->tipe=='bebas'){
+                // create tagihan
+                $tagihan = Tagihan::create([
+                    'siswa_id' => $request->siswaId,
+                    'jenis_pembayaran_id' => $jenisPembayaran->id,
+                ]);
+
+                TagihanDetail::create([
+                        'tagihan_id' => $tagihan->id,
+                        'status' => 'Belum Lunas',
+                        'keterangan' => 'Bebas',
+                        'total_bayar' => 0,
+                        'sisa' => $jenisPembayaran->harga,
+                    ]);
+
             }else{
                 //buat array data yg gagal add
                 array_push($gagal_add_tagihan,$nama_pembayaran);
@@ -410,12 +425,11 @@ class SiswaController extends Controller
 
             Excel::import(new SiswaImport, request()->file('import_siswa'));
 
-            session()->flash('success', "Data siswa Berhasil di import");
 
             return redirect(route('siswa.index'));
         } catch (\Exception $e) {
+            dd($e->getMessage());
             session()->flash('error', "Format excel tidak sesuai");
-
             return redirect(route('siswa.index'));
         }
     }

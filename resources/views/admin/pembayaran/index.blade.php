@@ -155,7 +155,7 @@
                 <div class="modal-body">
                     <form action="{{ route('pembayaran.import') }}" method="POST" enctype="multipart/form-data">
                         @csrf
-                        <div class="form-group">
+                        {{-- <div class="form-group">
                             <label for="jenis">Pilih Jenis Pembayaran</label>
                             <select name="jenis" id="jenis" required class="form-control @error('jenis') is-invalid @enderror">
                                         <option value="">-Pilih-</option>
@@ -165,7 +165,7 @@
                             @error('jenis')
                                 <div class="text-danger small mt-1">{{ $message }}</div>
                             @enderror
-                        </div>
+                        </div> --}}
 
                         <div class="form-group">
                             <label for="import_pembayaran">Import File</label>
